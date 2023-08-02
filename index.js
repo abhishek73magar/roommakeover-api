@@ -12,8 +12,8 @@ const port = process.env.PORT;
 // console.log(corsList.split(","));
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors({ origin: corsList.split(","), credentials: true }));
 app.use(express.static("public"));
+app.use(cors({ origin: corsList.split(","), credentials: true }));
 app.use(auth);
 app.use(require("./router"));
 

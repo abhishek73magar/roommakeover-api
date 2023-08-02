@@ -1,3 +1,4 @@
+#requied .env file for config api
 PORT=
 HOST=
 DBNAME=o

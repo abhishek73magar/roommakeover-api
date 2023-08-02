@@ -178,10 +178,14 @@ exports.deleteProductModel = (pid) => {
 exports.productImageModel = (pid) => {
   return new Promise(async (resolve, reject) => {
     try {
-      let images = knex("product__images");
+      let images = knex("product__images as a").leftJoin(
+        "products__list as b",
+        "a.product__id",
+        "b.pid"
+      );
       if (pid !== "all") images = images.where("product__id", pid);
 
-      images = await images;
+      images = await images.select("a.*", "b.title");
       return resolve(images);
     } catch (error) {
       return reject(error);
@@ -207,6 +211,7 @@ exports.topSellingProductModel = (total = 7) => {
         .where("status", "completed")
         .orWhere("status", "processing")
         .orWhere("status", "shipping");
+
       const uniqueOrder = orderList.reduce((prev, curr) => {
         const pid = curr.product__id;
         if (prev.hasOwnProperty(pid)) {
@@ -228,7 +233,7 @@ exports.topSellingProductModel = (total = 7) => {
       let products = await knex("products__list")
         .whereIn("pid", sortData)
         .andWhere("status", "published")
-        .select("id", "pid", "title", "price", "on_-sale", "category");
+        .select("id", "pid", "title", "price", "on__sale", "category");
       for (let i = 0; i < products.length; i++) {
         const product = products[i];
         const [image] = await knex("product__images").where(

@@ -37,6 +37,14 @@ const {
   removeCheckoutController,
 } = require("./controller/checkoutController");
 const {
+  addCommunityImages,
+  addCommunityPostController,
+  updateCommunityPostController,
+  getCommunityPostController,
+  getCommunityPostByTableNameController,
+  deleteCommunityPostController,
+} = require("./controller/communityPostController");
+const {
   uploadHobbieImages,
   addHobbieController,
   updateHobbieController,
@@ -212,5 +220,33 @@ router
   .get("/banner", getBannerController)
   .get("/banner/:type", getBannerByTypeController)
   .delete("/banner/:id", deleteBannerController);
+
+// our community products for users
+router
+  .post("/community", addCommunityImages, addCommunityPostController)
+  .patch("/community/:id", addCommunityImages, updateCommunityPostController)
+  .get("/community", getCommunityPostController)
+  .get("/community/client/:noofpage", getCommunityPostController)
+  .get("/community/client/:noofpage/:pagenumber", getCommunityPostController)
+  .get(
+    "/community/tablename/:colname/:value",
+    getCommunityPostByTableNameController
+  )
+
+  .get(
+    "/community/user/tablename/:colname/:value",
+    getCommunityPostByTableNameController
+  )
+  .get("/community/user", getCommunityPostController)
+  .get("/community/user/:noofpage", getCommunityPostController)
+  .get("/community/user/:noofpage/:pagenumber", getCommunityPostController)
+  .delete("/community/:id", deleteCommunityPostController);
+
+// our community orders
+router
+  .post("/community-order")
+  .patch("/community-order/:id")
+  .get("/community-order")
+  .get("/community-order/:pid");
 
 module.exports = router;
