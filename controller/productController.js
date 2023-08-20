@@ -10,6 +10,7 @@ const {
   productImageModel,
   topSellingProductModel,
   getOnSellProductModel,
+  getSearchProductModel,
 } = require("../model/productModel");
 
 exports.uploadProductImage = multer({
@@ -67,6 +68,12 @@ exports.topSellingProductController = (req, res) => {
 
 exports.getOnSellProductController = (req, res) => {
   getOnSellProductModel(req.role)
+    .then((data) => res.status(200).json(data))
+    .catch((err) => res.status(400).send(err));
+};
+
+exports.getSearchProductController = (req, res) => {
+  getSearchProductModel(req.params.title, req.role)
     .then((data) => res.status(200).json(data))
     .catch((err) => res.status(400).send(err));
 };

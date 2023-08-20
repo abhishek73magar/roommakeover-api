@@ -69,6 +69,7 @@ const {
   productImagesController,
   topSellingProductController,
   getOnSellProductController,
+  getSearchProductController,
 } = require("./controller/productController");
 const {
   getReviewController,
@@ -111,6 +112,7 @@ router
   .post("/product", uploadProductImage, addProductController)
   .patch("/product/:id", uploadProductImage, updateProductController)
   .get("/product/tablename/:colname/:value", getProductByTablenameController)
+  .get("/product/search/:title", getSearchProductController)
   .get("/product", getProductController)
   .get("/product/:noofproduct", getProductController)
   .get("/product/:noofproduct/:pagenumber", getProductController)

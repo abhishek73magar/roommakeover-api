@@ -277,3 +277,33 @@ exports.getOnSellProductModel = (role) => {
     }
   });
 };
+
+exports.getSearchProductModel = (title, role) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let products;
+      if (role === "client") {
+        products = knex("products__list").where("status", "published");
+      } else {
+        products = knex("products__list");
+      }
+
+      products = await products.whereLike("title", `%${title}%`);
+      for (let i = 0; i < products.length; i++) {
+        const product = products[i];
+        let [image] = await knex("product__images").where(
+          "product__id",
+          product.pid
+        );
+
+        product.url = image.url;
+        product.alt = image.originalname;
+      }
+
+      return resolve(products);
+    } catch (error) {
+      // console.log(error);
+      return reject(error);
+    }
+  });
+};
