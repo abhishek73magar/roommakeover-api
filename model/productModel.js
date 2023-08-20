@@ -288,7 +288,7 @@ exports.getSearchProductModel = (title, role) => {
         products = knex("products__list");
       }
 
-      products = await products.whereLike("title", `%${title}%`);
+      products = await products.whereILike("title", `%${title}%`);
       for (let i = 0; i < products.length; i++) {
         const product = products[i];
         let [image] = await knex("product__images").where(
