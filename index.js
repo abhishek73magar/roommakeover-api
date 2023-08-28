@@ -13,7 +13,18 @@ const port = process.env.PORT;
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.static("public"));
-app.use(cors({ origin: corsList.split(","), credentials: true }));
+app.use(
+  cors({
+    origin: [
+      "http://localhost:3000",
+      "http://localhost:3001",
+      "http://localhost:3002",
+      "http://localhost:4000",
+      "https://online-shop-three-beryl.vercel.app",
+    ],
+    credentials: true,
+  })
+);
 app.use(auth);
 app.use(require("./router"));
 
