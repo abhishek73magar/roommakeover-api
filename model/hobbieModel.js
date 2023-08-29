@@ -9,7 +9,7 @@ exports.addHobbieModel = (body, file) => {
         body.url = `hobbie-image/${file.filename}`;
       }
 
-      await knex("hobbies__list").insert(body);
+      await knex("hobbies").insert(body);
       return resolve("New hobbie added");
     } catch (error) {
       if (file) removeFile(`hobbie-image/${file.filename}`);
@@ -26,10 +26,10 @@ exports.updateHobbieModel = (body, file, id) => {
         body.url = `hobbie-image/${file.filename}`;
       }
 
-      const [hobbie] = await knex("hobbies__list").where("id", id);
+      const [hobbie] = await knex("hobbies").where("id", id);
       if (hobbie) removeFile(hobbie.url);
 
-      await knex("hobbies__list").insert(body);
+      await knex("hobbies").insert(body);
       return resolve("New hobbie added");
     } catch (error) {
       if (file) removeFile(`hobbie-image/${file.filename}`);
@@ -39,13 +39,13 @@ exports.updateHobbieModel = (body, file, id) => {
 };
 
 exports.getHobbieModel = () => {
-  return knex("hobbies__list");
+  return knex("hobbies");
 };
 
 exports.getHobbieByIdModel = (id) => {
-  return knex("hobbies__list").where("id", id);
+  return knex("hobbies").where("id", id);
 };
 
 exports.deleteHobbieModel = (id) => {
-  return knex("hoobies__list").where("id", id).delete();
+  return knex("hoobies_list").where("id", id).delete();
 };

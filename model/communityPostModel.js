@@ -8,7 +8,7 @@ exports.addCommunityPostModel = (body, files, user) => {
       body.pid = uid(10);
 
       return await knex.transaction((tnx) => {
-        return knex("community__post")
+        return knex("community_post")
           .transacting(tnx)
           .insert(body)
           .then(() => {
@@ -16,10 +16,10 @@ exports.addCommunityPostModel = (body, files, user) => {
               const images = files.map((file) => {
                 const url = `ourcommunity/${file.filename}`;
                 const originalname = file.originalname;
-                const user__id = user.id;
-                return { url, originalname, product__id: body.pid, user__id };
+                const user_id = user.id;
+                return { url, originalname, product_id: body.pid, user_id };
               });
-              return knex("community__post__images")
+              return knex("community_post_images")
                 .insert(images)
                 .then(() => {
                   tnx.commit();
@@ -44,9 +44,9 @@ exports.addCommunityPostModel = (body, files, user) => {
 exports.updateCommunityPostModel = (body, files, pid, user) => {
   return new Promise(async (resolve, reject) => {
     try {
-      let imageList = await knex("community__post__images");
+      let imageList = await knex("community_post_images");
       return await knex.transaction((tnx) => {
-        return knex("community__post")
+        return knex("community_post")
           .transacting(tnx)
           .where("pid", pid)
           .update(body)
@@ -55,17 +55,17 @@ exports.updateCommunityPostModel = (body, files, pid, user) => {
               const images = files.map((file) => {
                 const url = `ourcommunity/${file.filename}`;
                 const originalname = file.originalname;
-                const user__id = user.id;
-                return { url, originalname, product__id: body.pid, user__id };
+                const user_id = user.id;
+                return { url, originalname, product_id: body.pid, user_id };
               });
-              return knex("community__post__images")
+              return knex("community_post_images")
                 .insert(images)
                 .then(() => {
                   imageList = imageList.map((image) => {
                     return { id: image.id, url: image.url };
                   });
 
-                  return knex("community__post__images")
+                  return knex("community_post_images")
                     .whereIn("id", imageList.map((item) => item.id).join(","))
                     .delete()
                     .then(() => {
@@ -100,9 +100,9 @@ exports.getCommunityPostModel = (params, user) => {
     try {
       const result = { newData: [], paginationNum: 1 };
 
-      let data = knex("community__post");
+      let data = knex("community_post");
       if (!user) data = data.where("status", "onsale");
-      if (user) data = data.where("user__id", user.id);
+      if (user) data = data.where("user_id", user.id);
 
       if (params.hasOwnProperty("noofpage")) {
         let noofpage = params.noofpage;
@@ -121,8 +121,8 @@ exports.getCommunityPostModel = (params, user) => {
       data = await data.orderBy("date", "desc");
       for (let i = 0; i < data.length; i++) {
         const post = data[i];
-        const [image] = await knex("community__post__images").where(
-          "product__id",
+        const [image] = await knex("community_post_images").where(
+          "product_id",
           post.pid
         );
         if (image) {
@@ -148,16 +148,16 @@ exports.getCommunityPostByTableNameModel = (params, user) => {
         value = value.replace(/-/g, " ");
       }
 
-      let data = knex("community__post").where(colname, value);
+      let data = knex("community_post").where(colname, value);
       if (!user) data = data.andWhere("status", "onsale");
-      if (user) data = data.andWhere("user__id", user.id);
+      if (user) data = data.andWhere("user_id", user.id);
 
       const communityPost = await data;
 
       for (let i = 0; i < communityPost.length; i++) {
         let community = communityPost[i];
-        const images = await knex("community__post__images").where(
-          "product__id",
+        const images = await knex("community_post_images").where(
+          "product_id",
           community.pid
         );
         // console.log(images);
@@ -179,16 +179,16 @@ exports.getCommunityPostByTableNameModel = (params, user) => {
 exports.deleteCommunityPostModel = (pid, user) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const images = await knex("community__post__images").where(
-        "product__id",
+      const images = await knex("community_post_images").where(
+        "product_id",
         pid
       );
 
       return await knex.transaction((tnx) => {
-        return knex("community__post")
+        return knex("community_post")
           .transacting(tnx)
           .where("pid", pid)
-          .andWhere("user__id", user.id)
+          .andWhere("user_id", user.id)
           .delete()
           .then(() => {
             images.forEach((image) => removeFile(image.url));

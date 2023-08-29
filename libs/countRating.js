@@ -3,7 +3,7 @@ const knex = require("../db");
 exports.countRating = (pid) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const rating = await knex("reviews").where("product__id", pid);
+      const rating = await knex("reviews").where("product_id", pid);
       // if (!rating) resolve(null);
       const total = rating.reduce((prev, curr) => {
         return (prev += parseInt(curr.rating));

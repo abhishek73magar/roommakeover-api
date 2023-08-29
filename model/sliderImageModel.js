@@ -11,7 +11,7 @@ exports.addSliderImageModel = (files) => {
         return { name, originalname, url };
       });
 
-      await knex("slider__images").insert(obj);
+      await knex("slider_images").insert(obj);
       return resolve("Slider images added");
     } catch (error) {
       if (files) {
@@ -25,9 +25,9 @@ exports.addSliderImageModel = (files) => {
 };
 
 exports.getSliderImageModel = () => {
-  return knex("slider__images");
+  return knex("slider_images");
 };
 
 exports.deleteSliderImagesModel = (id) => {
-  return knex("slider__images").where("id", id).delete();
+  return knex("slider_images").where("id", id).delete();
 };

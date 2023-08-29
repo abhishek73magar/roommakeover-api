@@ -4,11 +4,11 @@ const knex = require("../db");
 exports.addOrderModel = (body, user) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const collection__id = uid(10);
+      const collection_id = uid(10);
       const obj = body.map((val) => {
-        val.collection__id = collection__id;
+        val.collection_id = collection_id;
         val.id = uid(10);
-        val.user__id = user.id;
+        val.user_id = user.id;
         return val;
       });
       // console.log(obj);
@@ -18,7 +18,7 @@ exports.addOrderModel = (body, user) => {
           .insert(obj)
           .then(() => {
             return knex("checkout")
-              .where("user__id", user.id)
+              .where("user_id", user.id)
               .delete()
               .then(tnx.commit)
               .then(() => resolve("Order send"))
@@ -37,7 +37,7 @@ exports.addOrderModel = (body, user) => {
 exports.updateOrderModel = (body, id) => {
   return new Promise(async (resolve, reject) => {
     try {
-      await knex("orders").where("collection__id", id).update(body);
+      await knex("orders").where("collection_id", id).update(body);
       return resolve("Order Updated");
     } catch (error) {
       return reject(error);
@@ -45,16 +45,16 @@ exports.updateOrderModel = (body, id) => {
   });
 };
 
-exports.getOrdersModel = (user__id, role) => {
+exports.getOrdersModel = (user_id, role) => {
   return new Promise(async (resolve, reject) => {
     try {
       let orders = knex("orders as a").leftJoin(
-        "billing__address as b",
-        "a.address__id",
+        "billing_address as b",
+        "a.address_id",
         "b.id"
       );
       if (role === "client") {
-        orders = orders.where("a.user__id", user__id);
+        orders = orders.where("a.user_id", user_id);
       }
 
       orders = await orders
@@ -72,9 +72,9 @@ exports.getOrdersModel = (user__id, role) => {
         .orderBy("date", "DESC");
       for (let i = 0; i < orders.length; i++) {
         const order = orders[i];
-        const [image] = await knex("product__images").where(
-          "product__id",
-          order.product__id
+        const [image] = await knex("product_images").where(
+          "product_id",
+          order.product_id
         );
         order.url = image.url;
         order.alt = image.originalname;
@@ -93,10 +93,10 @@ exports.getOrderByIdModel = (name, value) => {
     try {
       let data = await knex("orders")
         .join(
-          "billing__address",
-          "orders.address__id",
+          "billing_address",
+          "orders.address_id",
           "=",
-          "billing__address.id"
+          "billing_address.id"
         )
         .where(`orders.${name}`, value);
 

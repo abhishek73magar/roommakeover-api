@@ -13,17 +13,17 @@ exports.addProductModel = (body, files) => {
           const name = file.filename;
           const url = "product/" + name;
           const originalname = file.originalname;
-          return { name, url, originalname, product__id: pid };
+          return { name, url, originalname, product_id: pid };
         });
 
         return await knex
           .transaction((tnx) => {
             const obj = { pid, ...body };
-            return knex("product__images")
+            return knex("product_images")
               .transacting(tnx)
               .insert(fileList)
               .then(() => {
-                return knex("products__list")
+                return knex("products")
                   .insert(obj)
                   .then(() => {
                     tnx.commit();
@@ -37,7 +37,7 @@ exports.addProductModel = (body, files) => {
       }
 
       const obj = { pid, ...body };
-      await knex("products__list").insert(obj);
+      await knex("products").insert(obj);
       return resolve("Product added");
     } catch (error) {
       if (files) {
@@ -57,9 +57,9 @@ exports.getProductModel = (params, role) => {
       const result = { newData: [], paginationNum: 1 };
       let products;
       if (role === "client") {
-        products = knex("products__list").where("status", "published");
+        products = knex("products").where("status", "published");
       } else {
-        products = knex("products__list");
+        products = knex("products");
       }
 
       if (params.hasOwnProperty("noofproduct")) {
@@ -78,8 +78,8 @@ exports.getProductModel = (params, role) => {
       products = await products;
       for (let i = 0; i < products.length; i++) {
         const product = products[i];
-        let [image] = await knex("product__images").where(
-          "product__id",
+        let [image] = await knex("product_images").where(
+          "product_id",
           product.pid
         );
 
@@ -100,7 +100,7 @@ exports.getProductByTablenameModel = (params, role) => {
       let { colname, value } = params;
       value = value.replace(/-/g, " ");
 
-      let products = knex("products__list").where(colname, value);
+      let products = knex("products").where(colname, value);
       if (role === "client")
         products = products.andWhere("status", "published");
 
@@ -109,8 +109,8 @@ exports.getProductByTablenameModel = (params, role) => {
 
       for (let i = 0; i < products.length; i++) {
         const product = products[i];
-        let images = await knex("product__images").where(
-          "product__id",
+        let images = await knex("product_images").where(
+          "product_id",
           product.pid
         );
         if (images) {
@@ -136,14 +136,14 @@ exports.updateProductModel = (body, files, pid) => {
           const name = file.filename;
           const url = "product/" + name;
           const originalname = file.originalname;
-          return { name, url, originalname, product__id: pid };
+          return { name, url, originalname, product_id: pid };
         });
 
-        await knex("product__images").insert(fileList);
+        await knex("product_images").insert(fileList);
       }
 
-      const obj = { ...body, update__date: new Date() };
-      await knex("products__list").where("pid", pid).update(obj);
+      const obj = { ...body, update_date: new Date() };
+      await knex("products").where("pid", pid).update(obj);
       return resolve("Update successfully");
     } catch (error) {
       if (files) {
@@ -160,14 +160,14 @@ exports.updateProductModel = (body, files, pid) => {
 exports.deleteProductModel = (pid) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const images = await knex("product__images").where("product__id", pid);
+      const images = await knex("product_images").where("product_id", pid);
 
-      await knex("product__images").where("product__id", pid).delete();
+      await knex("product_images").where("product_id", pid).delete();
       images.forEach((image) => {
         removeFile(image.url);
       });
 
-      await knex("products__list").where("product__id", pid).delete();
+      await knex("products").where("product_id", pid).delete();
       return resolve("Product Removed");
     } catch (error) {
       return reject(error);
@@ -178,12 +178,12 @@ exports.deleteProductModel = (pid) => {
 exports.productImageModel = (pid) => {
   return new Promise(async (resolve, reject) => {
     try {
-      let images = knex("product__images as a").leftJoin(
-        "products__list as b",
-        "a.product__id",
+      let images = knex("product_images as a").leftJoin(
+        "products as b",
+        "a.product_id",
         "b.pid"
       );
-      if (pid !== "all") images = images.where("product__id", pid);
+      if (pid !== "all") images = images.where("product_id", pid);
 
       images = await images.select("a.*", "b.title");
       return resolve(images);
@@ -196,7 +196,7 @@ exports.productImageModel = (pid) => {
 exports.totalProductsModel = () => {
   return new Promise(async (resolve, reject) => {
     try {
-      const [count] = await knex("products__list").count({ count: "*" });
+      const [count] = await knex("products").count({ count: "*" });
       return resolve(count);
     } catch (error) {
       return reject(error);
@@ -213,7 +213,7 @@ exports.topSellingProductModel = (total = 7) => {
         .orWhere("status", "shipping");
 
       const uniqueOrder = orderList.reduce((prev, curr) => {
-        const pid = curr.product__id;
+        const pid = curr.product_id;
         if (prev.hasOwnProperty(pid)) {
           prev[pid] += parseInt(curr.qty);
         } else {
@@ -230,14 +230,14 @@ exports.topSellingProductModel = (total = 7) => {
         .slice(0, total)
         .map(({ pid }) => pid);
 
-      let products = await knex("products__list")
+      let products = await knex("products")
         .whereIn("pid", sortData)
         .andWhere("status", "published")
-        .select("id", "pid", "title", "price", "on__sale", "category");
+        .select("id", "pid", "title", "price", "on_sale", "category");
       for (let i = 0; i < products.length; i++) {
         const product = products[i];
-        const [image] = await knex("product__images").where(
-          "product__id",
+        const [image] = await knex("product_images").where(
+          "product_id",
           product.pid
         );
         product.url = image.url;
@@ -254,14 +254,14 @@ exports.topSellingProductModel = (total = 7) => {
 exports.getOnSellProductModel = (role) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const products = await knex("products__list")
+      const products = await knex("products")
         .where("status", "published")
-        .andWhere("on__sale", "1");
+        .andWhere("on_sale", "1");
 
       for (let i = 0; i < products.length; i++) {
         const product = products[i];
-        const [image] = await knex("product__images").where(
-          "product__id",
+        const [image] = await knex("product_images").where(
+          "product_id",
           product.pid
         );
         product.url = image.url;
@@ -283,16 +283,16 @@ exports.getSearchProductModel = (title, role) => {
     try {
       let products;
       if (role === "client") {
-        products = knex("products__list").where("status", "published");
+        products = knex("products").where("status", "published");
       } else {
-        products = knex("products__list");
+        products = knex("products");
       }
 
       products = await products.whereILike("title", `%${title}%`);
       for (let i = 0; i < products.length; i++) {
         const product = products[i];
-        let [image] = await knex("product__images").where(
-          "product__id",
+        let [image] = await knex("product_images").where(
+          "product_id",
           product.pid
         );
 

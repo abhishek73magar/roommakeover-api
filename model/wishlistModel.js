@@ -5,7 +5,7 @@ exports.addWishlistModel = (body, user) => {
   return new Promise(async (resolve, reject) => {
     try {
       body.id = uid(10);
-      body.user__id = user.id;
+      body.user_id = user.id;
       await knex("wishlist").insert(body);
       return resolve("Product add to wishlist");
     } catch (error) {
@@ -22,14 +22,14 @@ exports.getWishlistModel = (user) => {
   return new Promise(async (resolve, reject) => {
     try {
       const products = await knex("wishlist as a")
-        .leftJoin("products__list as b", "a.product__id", "b.pid")
-        .where("a.user__id", user.id)
+        .leftJoin("products_list as b", "a.product_id", "b.pid")
+        .where("a.user_id", user.id)
         .select("a.*", "b.pid", "b.title", "b.price", "b.category");
 
       for (let i = 0; i < products.length; i++) {
         const product = products[i];
-        const [image] = await knex("product__images").where(
-          "product__id",
+        const [image] = await knex("product_images").where(
+          "product_id",
           product.pid
         );
         product.url = image.url;
@@ -47,13 +47,13 @@ exports.getWishlistByIdModel = (id, user) => {
   return new Promise(async (resolve, reject) => {
     try {
       const product = await knex("wishlist as a")
-        .leftJoin("products__list as b", "a.product__id", "b.pid")
-        .where("a.user__id", user.id)
+        .leftJoin("products_list as b", "a.product_id", "b.pid")
+        .where("a.user_id", user.id)
         .AndWhere("b.id", id)
         .select("a.*", "b.pid", "b.title", "b.price", "b.category");
 
-      const [image] = await knex("product__images").where(
-        "product__id",
+      const [image] = await knex("product_images").where(
+        "product_id",
         product.pid
       );
       product.imagesrc = image.url;
@@ -67,8 +67,8 @@ exports.getWishlistByIdModel = (id, user) => {
 
 exports.removeWishListModel = (pid, user) => {
   return knex("wishlist")
-    .where("product__id", pid)
-    .andWhere("user__id", user.id)
+    .where("product_id", pid)
+    .andWhere("user_id", user.id)
     .delete();
 };
 

@@ -1,27 +1,21 @@
 const knex = require("knex")({
-  client: "mysql",
-  connection: {
-    host: process.env.HOST,
-    port: 3306,
-    user: process.env.DBUSER,
-    password: process.env.DBPASSWORD,
-    database: process.env.DBNAME,
-  },
+  client: "postgresql",
+  connection: process.env.DB_URL,
 });
 
-const bcrypt = require("bcrypt");
+// const bcrypt = require("bcrypt");
 knex
   .raw("SELECT 1")
   .then(() => console.log(`Database connected`))
   .catch((err) => console.log("Database is not connected", err));
 
-const userObj = {
-  email: "admin@rts.com.np",
-  role: "admin",
-  name: "Admin",
-  status: true,
-  terms: true,
-};
+// const userObj = {
+//   email: "admin@rts.com.np",
+//   role: "admin",
+//   name: "Admin",
+//   status: true,
+//   terms: true,
+// };
 
 // knex("users")
 //   .where("email", "admin@rts.com.np")

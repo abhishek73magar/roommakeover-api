@@ -3,15 +3,15 @@ const knex = require("../db");
 exports.addReviewModel = (body, user) => {
   return new Promise(async (resolve, reject) => {
     try {
-      body.user__id = user.id;
+      body.user_id = user.id;
       return await knex.transaction((tnx) => {
         return knex("reviews")
           .transacting(tnx)
           .insert(body)
           .then(() => {
             return knex("orders")
-              .where("id", body.order__id)
-              .andWhere("user__id", user.id)
+              .where("id", body.order_id)
+              .andWhere("user_id", user.id)
               .update({ review: 1 })
               .then(() => {
                 tnx.commit();
@@ -39,7 +39,7 @@ exports.getReviewModel = (params, role, user) => {
       const result = { newData: [], paginationNum: 1 };
       let data;
       if (role === "client") {
-        data = knex("reviews").where("user__id", user.id);
+        data = knex("reviews").where("user_id", user.id);
       } else {
         data = knex("reviews");
       }
@@ -72,12 +72,12 @@ exports.getReviewByProductIdModel = (pid, role, user) => {
   return new Promise(async (resolve, reject) => {
     try {
       let data = await knex("reviews")
-        .where("product__id", pid)
+        .where("product_id", pid)
         .andWhere("status", "Enable");
       if (role === "client") {
         const userReview = await knex("reviews")
-          .where("user__id", user.id)
-          .andWhere("product__id", pid);
+          .where("user_id", user.id)
+          .andWhere("product_id", pid);
 
         let newData = data.concat(userReview);
         newData = newData.reduce((prev, curr) => {
