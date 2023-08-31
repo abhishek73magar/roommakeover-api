@@ -1,9 +1,9 @@
 exports.setCookie = (res, name, value, expireDate) => {
   return res.cookie(name, value, {
+    maxAge: expireDate,
     httpOnly: true,
-    secure: true,
     path: "/",
     sameSite: "none",
-    maxAge: expireDate,
+    secure: true,
   });
 };
