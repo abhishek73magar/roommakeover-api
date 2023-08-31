@@ -39,7 +39,7 @@ exports.getCheckoutModel = (user) => {
   return new Promise(async (resolve, reject) => {
     try {
       const products = await knex("checkout as a")
-        .join("products_list as b", "a.product_id", "b.pid")
+        .join("products as b", "a.product_id", "b.pid")
         .where("a.user_id", user.id)
         .select("a.*", "b.pid", "b.title", "b.price", "b.category");
 

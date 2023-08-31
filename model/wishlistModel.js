@@ -22,7 +22,7 @@ exports.getWishlistModel = (user) => {
   return new Promise(async (resolve, reject) => {
     try {
       const products = await knex("wishlist as a")
-        .leftJoin("products_list as b", "a.product_id", "b.pid")
+        .leftJoin("products as b", "a.product_id", "b.pid")
         .where("a.user_id", user.id)
         .select("a.*", "b.pid", "b.title", "b.price", "b.category");
 
@@ -47,7 +47,7 @@ exports.getWishlistByIdModel = (id, user) => {
   return new Promise(async (resolve, reject) => {
     try {
       const product = await knex("wishlist as a")
-        .leftJoin("products_list as b", "a.product_id", "b.pid")
+        .leftJoin("products as b", "a.product_id", "b.pid")
         .where("a.user_id", user.id)
         .AndWhere("b.id", id)
         .select("a.*", "b.pid", "b.title", "b.price", "b.category");

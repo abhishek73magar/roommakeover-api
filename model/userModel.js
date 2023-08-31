@@ -53,7 +53,7 @@ exports.loginUserModel = (body, res) => {
     try {
       let { email, password } = body;
       const [user] = await knex("users").where("email", email);
-      if (Object.keys(user).length === 0) return reject("Invalid user");
+      if (!user) return reject("User not found");
       const compare = bcrypt.compareSync(password, user.password);
       if (!compare) return reject("Invalid user");
 
