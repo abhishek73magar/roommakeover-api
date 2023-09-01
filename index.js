@@ -21,6 +21,7 @@ app.use(
       "http://localhost:3002",
       "http://localhost:4000",
       "https://online-shop-three-beryl.vercel.app",
+      "https://roommakeover.theminiland.com",
     ],
     credentials: true,
   })
