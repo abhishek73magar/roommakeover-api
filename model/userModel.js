@@ -5,8 +5,9 @@ const { genToken } = require("../libs/token");
 const genPwd = require("generate-password");
 const { setCookie } = require("../libs/setCookie");
 const jwt = require("jsonwebtoken");
+const moment = require("moment");
 
-const expireDate = new Date(Date.now() + 1000 * 60 * 60 * 24 * 1).getTime();
+const expireDate = moment().add(1, "day").unix();
 
 exports.signUpUserModel = (body, res) => {
   return new Promise(async (resolve, reject) => {
@@ -33,7 +34,7 @@ exports.signUpUserModel = (body, res) => {
               { id, firstname, lastname, email },
               expireDate
             );
-            setCookie(res, "usertoken", token, expireDate * 1000);
+            setCookie(res, "usertoken", token, expireDate);
             trx.commit();
             return resolve(token);
           })
@@ -59,7 +60,7 @@ exports.loginUserModel = (body, res) => {
 
       const { id, firstname, lastname } = user;
       const token = genToken({ id, firstname, lastname, email }, expireDate);
-      setCookie(res, "usertoken", token, expireDate * 1000);
+      setCookie(res, "usertoken", token, expireDate);
       return resolve(token);
     } catch (error) {
       return reject(error);
@@ -74,7 +75,7 @@ exports.loginWithSocialUserModel = (body, res) => {
       if (user) {
         const { id, firstname, lastname, email } = user;
         const token = genToken({ id, firstname, lastname, email }, expireDate);
-        setCookie(res, "usertoken", token, expireDate * 1000);
+        setCookie(res, "usertoken", token, expireDate);
         return resolve(token);
       }
 
@@ -87,7 +88,7 @@ exports.loginWithSocialUserModel = (body, res) => {
       const { firstname, lastname, email } = body;
 
       const token = genToken({ id, firstname, lastname, email }, expireDate);
-      setCookie(res, "usertoken", token, expireDate * 1000);
+      setCookie(res, "usertoken", token, expireDate);
       return resolve(token);
     } catch (error) {
       console.log(error);
@@ -164,7 +165,7 @@ exports.verifyUserModel = (req) => {
           .then(([user]) => {
             // console.log(user);
             delete user.password;
-            resolve({ token, user });
+            return resolve({ token, user });
           })
           .catch((err) => {
             return reject({ auth: true, error: "Unauthorized user" });
