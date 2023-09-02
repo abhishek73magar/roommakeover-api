@@ -131,7 +131,7 @@ exports.getProductByTablenameModel = (params, role) => {
 exports.updateProductModel = (body, files, pid) => {
   return new Promise(async (resolve, reject) => {
     try {
-      if (files) {
+      if (files && Array.isArray(files) && files.length !== 0) {
         const fileList = files.map((file) => {
           const name = file.filename;
           const url = "product/" + name;
@@ -146,6 +146,7 @@ exports.updateProductModel = (body, files, pid) => {
       await knex("products").where("pid", pid).update(obj);
       return resolve("Update successfully");
     } catch (error) {
+      console.log(error);
       if (files) {
         files.forEach(({ filename }) => {
           const path = `product/${filename}`;

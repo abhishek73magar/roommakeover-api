@@ -110,7 +110,7 @@ router.get("/test", (req, res) => res.send("api is running"));
 // products
 router
   .post("/product", uploadProductImage, addProductController)
-  .patch("/product/:id", uploadProductImage, updateProductController)
+  .patch("/product/:pid", uploadProductImage, updateProductController)
   .get("/product/tablename/:colname/:value", getProductByTablenameController)
   .get("/product/search/:title", getSearchProductController)
   .get("/product", getProductController)
