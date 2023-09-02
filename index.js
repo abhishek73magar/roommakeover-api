@@ -12,7 +12,7 @@ const port = process.env.PORT;
 // console.log(corsList.split(","));
 app.use(express.json());
 app.use(cookieParser());
-app.use(express.static("public"));
+app.use("/api", express.static("public"));
 app.use(
   cors({
     origin: [
@@ -27,6 +27,6 @@ app.use(
   })
 );
 app.use(auth);
-app.use(require("./router"));
+app.use("/api", require("./router"));
 
 app.listen(port, () => console.log(`Server Start at ${port}`));
