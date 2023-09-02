@@ -5,7 +5,7 @@ exports.setCookie = (res, name, value, expireDate) => {
     maxAge: expireDate,
     httpOnly: true,
     path: "/",
-    sameSite: "none",
     secure: true,
+    sameSite: "none",
   });
 };
