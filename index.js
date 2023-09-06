@@ -12,22 +12,7 @@ const port = process.env.PORT;
 // console.log(corsList.split(","));
 app.use(express.json());
 app.use(cookieParser());
-const staticPaths = [
-  "banners",
-  "brands",
-  "categorysbg",
-  "design-your-room",
-  "hobbie-images",
-  "ourcommunity",
-  "products",
-  "room-make-over",
-  "slider-images",
-  "videos",
-];
-// app.use("/api", express.static("public"));
-staticPaths.map((staticPath) => {
-  app.use(`/api/${staticPath}`, express.static(`public/${staticPath}`));
-});
+app.use(express.static("public"));
 
 app.use(
   cors({
