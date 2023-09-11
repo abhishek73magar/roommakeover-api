@@ -11,23 +11,23 @@ const { auth } = require("./libs/auth");
 const port = process.env.PORT;
 // console.log(corsList.split(","));
 
+app.use(cookieParser());
 app.use(express.static("public"));
 app.use(express.json());
-app.use(cookieParser());
 
-app.use(
-  cors({
-    origin: [
-      "http://localhost:3000",
-      "http://localhost:3001",
-      "http://localhost:3002",
-      "http://localhost:4000",
-      "https://online-shop-three-beryl.vercel.app",
-      "https://roommakeover.theminiland.com",
-    ],
-    credentials: true,
-  })
-);
+const corsOptions = {
+  origin: [
+    "http://localhost:3000",
+    "http://localhost:3001",
+    "http://localhost:3002",
+    "http://localhost:4000",
+    "https://online-shop-three-beryl.vercel.app",
+    "https://roommakeover.theminiland.com",
+  ],
+  credentials: true,
+}
+
+app.use(cors(corsOptions));
 app.use(auth);
 app.use("/api", require("./router"));
 
