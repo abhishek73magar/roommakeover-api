@@ -5,6 +5,7 @@ exports.addCategoryModel = (body, file) => {
   return new Promise(async (resolve, reject) => {
     try {
       body.imagesrc = "";
+      // console.log(body, file);
       if (file) {
         body.imagesrc = `categorysbg/${file.filename}`;
       }
@@ -15,6 +16,7 @@ exports.addCategoryModel = (body, file) => {
         const path = `categorybg/${path}`;
         removeFile(path);
       }
+      console.log(error);
       return reject(error);
     }
   });
@@ -26,13 +28,14 @@ exports.updateCategoryModel = (body, file, id) => {
       if (file) {
         body.imagesrc = `categorysbg/${file.filename}`;
         const [category] = await knex("categorys").where("id", id);
-        removeFile(category.filename);
+        removeFile(category.imagesrc);
       }
       await knex("categorys").where("id", id).update(body);
       return resolve("Category Updated");
     } catch (error) {
+      console.log(error);
       if (file) {
-        const path = `categorybg/${path}`;
+        const path = `categorybg/${file.filename}`;
         removeFile(path);
       }
       return reject(error);
@@ -61,19 +64,20 @@ exports.deleteCategoryModel = (id) => {
       const [category] = await knex("categorys").where("id", id);
       if (!category) return reject("Category not found");
       return await knex.transaction((tnx) => {
-        return knex("category")
+        return knex("categorys")
           .transacting(tnx)
           .where("id", id)
           .delete()
           .then(() => {
-            removeFile(category.imagesrc);
-            tnx.commit();
-            return resolve("Category removed");
+            if (category.imagesrc !== "") removeFile(category.imagesrc);
+            return tnx.commit();
           })
+          .then(() => resolve("Category Removed"))
           .catch(tnx.rollback)
           .catch((err) => reject(err));
       });
     } catch (error) {
+      console.log(error);
       return reject(error);
     }
   });

@@ -10,9 +10,10 @@ const cookieParser = require("cookie-parser");
 const { auth } = require("./libs/auth");
 const port = process.env.PORT;
 // console.log(corsList.split(","));
+
+app.use(express.static("public"));
 app.use(express.json());
 app.use(cookieParser());
-app.use(express.static("public"));
 
 app.use(
   cors({

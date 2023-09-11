@@ -28,6 +28,7 @@ const {
   getCategoryController,
   deleteCategoryController,
   getCateogryByIdController,
+  uploadCategoryImage,
 } = require("./controller/categoryController");
 const {
   addCheckoutController,
@@ -143,8 +144,8 @@ router
 
 // cateogrys
 router
-  .post("/category", addCategoryController)
-  .patch("/category", updateCategoryController)
+  .post("/category", uploadCategoryImage, addCategoryController)
+  .patch("/category/:id", uploadCategoryImage, updateCategoryController)
   .get("/category", getCategoryController)
   .get("/category/:id", getCateogryByIdController)
   .delete("/category/:id", deleteCategoryController)
