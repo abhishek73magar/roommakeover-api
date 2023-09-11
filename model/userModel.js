@@ -34,7 +34,7 @@ exports.signUpUserModel = (body, res) => {
               { id, firstname, lastname, email },
               expireDate
             );
-            setCookie(res, "usertoken", token, expireDate);
+            setCookie(res, "usertoken", token);
             trx.commit();
             return resolve(token);
           })
@@ -60,7 +60,7 @@ exports.loginUserModel = (body, res) => {
 
       const { id, firstname, lastname } = user;
       const token = genToken({ id, firstname, lastname, email }, expireDate);
-      setCookie(res, "usertoken", token, expireDate);
+      setCookie(res, "usertoken", token);
       return resolve(token);
     } catch (error) {
       return reject(error);
@@ -75,7 +75,7 @@ exports.loginWithSocialUserModel = (body, res) => {
       if (user) {
         const { id, firstname, lastname, email } = user;
         const token = genToken({ id, firstname, lastname, email }, expireDate);
-        setCookie(res, "usertoken", token, expireDate);
+        setCookie(res, "usertoken", token);
         return resolve(token);
       }
 
@@ -88,7 +88,7 @@ exports.loginWithSocialUserModel = (body, res) => {
       const { firstname, lastname, email } = body;
 
       const token = genToken({ id, firstname, lastname, email }, expireDate);
-      setCookie(res, "usertoken", token, expireDate);
+      setCookie(res, "usertoken", token);
       return resolve(token);
     } catch (error) {
       console.log(error);

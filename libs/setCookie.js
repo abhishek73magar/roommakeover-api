@@ -1,8 +1,9 @@
 const moment = require("moment");
-exports.setCookie = (res, name, value, expireDate) => {
-  console.log(moment(expireDate).format());
+
+exports.setCookie = (res, name, value, expired) => {
+  if(!expired) { expired = moment(0).add(1, 'day').valueOf() }
   return res.cookie(name, value, {
-    maxAge: expireDate,
+    maxAge: expired,
     httpOnly: true,
     path: "/",
     secure: true,
