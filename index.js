@@ -27,6 +27,12 @@ const corsOptions = {
   credentials: true,
 }
 
+app.use((req, res, next) => {
+  // Remove the X-Served-By header
+  res.removeHeader('X-Served-By');
+  next();
+});
+
 app.use(cors(corsOptions));
 app.use(auth);
 app.use("/api", require("./router"));
