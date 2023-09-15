@@ -11,7 +11,7 @@ exports.addProductModel = (body, files) => {
       if (files) {
         const fileList = files.map((file) => {
           const name = file.filename;
-          const url = "product/" + name;
+          const url = "products/" + name;
           const originalname = file.originalname;
           return { name, url, originalname, product_id: pid };
         });
@@ -128,13 +128,27 @@ exports.getProductByTablenameModel = (params, role) => {
   });
 };
 
+exports.getProductByPIDModel = (pid) => {
+  return new Promise(async(resolve, reject) => {
+    try {
+      const [product] = await knex('products').where('pid', pid)
+      // const images = await knex('product_images').where('product_id', pid)
+      if(!product) return reject("Product not found !")
+      return resolve(product)
+    } catch (error) { 
+      console.log(error)
+      return reject(error)
+    }
+  })
+}
+
 exports.updateProductModel = (body, files, pid) => {
   return new Promise(async (resolve, reject) => {
     try {
       if (files && Array.isArray(files) && files.length !== 0) {
         const fileList = files.map((file) => {
           const name = file.filename;
-          const url = "product/" + name;
+          const url = "products/" + name;
           const originalname = file.originalname;
           return { name, url, originalname, product_id: pid };
         });
@@ -142,7 +156,8 @@ exports.updateProductModel = (body, files, pid) => {
         await knex("product_images").insert(fileList);
       }
 
-      const obj = { ...body, update_date: new Date() };
+      const obj = { ...body, update_date: new Date().toISOString() };
+
       await knex("products").where("pid", pid).update(obj);
       return resolve("Update successfully");
     } catch (error) {
@@ -193,6 +208,19 @@ exports.productImageModel = (pid) => {
     }
   });
 };
+
+exports.deleteProdcutImageModel = (id) => {
+  return new Promise(async(resolve, reject) => {
+    try {
+      const [image] = await knex('product_images').where('id', id)
+      await knex('product_images').where('id', id).delete();
+      removeFile(image.url)
+      return resolve("Remove image")
+    } catch (error) {
+      return reject(error)
+    }
+  })
+}
 
 exports.totalProductsModel = () => {
   return new Promise(async (resolve, reject) => {
