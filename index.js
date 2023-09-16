@@ -30,5 +30,6 @@ app.use(
 );
 app.use(auth);
 app.use("/api", require("./router"));
+app.use('/api/admin', require("./router/adminRouter"))
 
 app.listen(port, () => console.log(`Server Start at ${port}`));
