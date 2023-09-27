@@ -1,6 +1,7 @@
 const { uploadHobbieThumbnail, addHobbieForAdminController, updateHobbieForAdminController, getHobbieForAdminController, getHobbieByIdForAdminController, deleteHobbieForAdminController } = require('../controller/admin/hobbieController');
+const { addHobbieProductController, updateHobbieProductController, uploadHobbieProductThumbnail, getHobbieProductController, getHobbieProductByIdController, deleteHobbieProductController } = require('../controller/admin/hobbieProductController');
 const { getOrderForAdminController, updateOrderForAdminController, getOrderByIdForAdminController } = require('../controller/admin/orderController');
-const { addProductForAdminController, uploadProductImage, updateProductForAdminController, getProductForAdminController, getProductByPIDForAdminController, deleteProductForAdminController } = require('../controller/admin/productController');
+const { addProductForAdminController, uploadProductImage, updateProductForAdminController, getProductForAdminController, getProductByPIDForAdminController, deleteProductForAdminController, getProductSingleImageConroller } = require('../controller/admin/productController');
 
 const router = require('express').Router();
 
@@ -9,6 +10,7 @@ const router = require('express').Router();
 router
   .post('/product', uploadProductImage, addProductForAdminController)
   .patch('/product/:pid', uploadProductImage, updateProductForAdminController)
+  .post('/product/image', getProductSingleImageConroller)
   .get('/product', getProductForAdminController)
   .get('/product/page/:total', getProductForAdminController)
   .get('/product/page/:total/:pagenumber', getProductForAdminController)
@@ -30,6 +32,14 @@ router
   .get('/hobbie', getHobbieForAdminController)
   .get('/hobbie/:id', getHobbieByIdForAdminController)
   .delete('/hobbie/:id', deleteHobbieForAdminController)
+
+// for hobbie product
+router
+  .post('/hobbie-product', uploadHobbieProductThumbnail, addHobbieProductController)
+  .patch('/hobbie-product/:id', uploadHobbieProductThumbnail, updateHobbieProductController)
+  .get('/hobbie-product', getHobbieProductController)
+  .get('/hobbie-product/:id', getHobbieProductByIdController)
+  .delete('/hobbie-product/:id', deleteHobbieProductController)
 
 router
   .post('/hobbie/list')

@@ -112,6 +112,23 @@ exports.getProductByPIDForAdminModel = (pid) => {
   })
 }
 
+exports.getProductSingleImageModel = (body) => {
+  return new Promise(async(resolve, reject) => {
+    try {
+      
+      const images = await knex('product_images').whereIn('product_id', body.id)
+
+      return resolve(images.reduce((prev, curr) => {
+        const check = prev.some((item) => item.product_id === curr.product_id)
+        if(!check) prev.push(curr)
+        return prev;
+      }, []))
+    } catch (error) {
+      return reject(error)
+    }
+  })
+}
+
 exports.deleteProductForAdminModel = (pid) => {
   return new Promise(async (resolve, reject) => {
     const tnx = await tnx.transaction();
