@@ -77,11 +77,17 @@ exports.getHobbieProductModel = () => {
   })
 }
 
-exports.getHobbieProductByIdModel = () => {
+exports.getHobbieProductByIdModel = (id) => {
   return new Promise(async(resolve, reject) => {
-    try {
-      resolve([])
+    try { 
+      const [hobbieProduct] = await knex('hobbie_products').where('id', id)
+      const productList = await knex('hobbie_product_list').where('hobbie_product_id', id)
+      const query = `
+          
+        `
+      return resolve({ hobbieProduct, productList })
     } catch (error) {
+      console.log(error)
       return reject(error)
     }
   })
