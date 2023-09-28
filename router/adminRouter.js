@@ -1,3 +1,4 @@
+const { uploadDIYProductThumbnail, addDIYProductController, getDIYProductController, updateDIYProductController, deleteDIYProductController, getDIYProductByIdController } = require('../controller/admin/diyProductController');
 const { uploadHobbieThumbnail, addHobbieForAdminController, updateHobbieForAdminController, getHobbieForAdminController, getHobbieByIdForAdminController, deleteHobbieForAdminController } = require('../controller/admin/hobbieController');
 const { addHobbieProductController, updateHobbieProductController, uploadHobbieProductThumbnail, getHobbieProductController, getHobbieProductByIdController, deleteHobbieProductController } = require('../controller/admin/hobbieProductController');
 const { getOrderForAdminController, updateOrderForAdminController, getOrderByIdForAdminController } = require('../controller/admin/orderController');
@@ -45,5 +46,14 @@ router
   .post('/hobbie/list')
   .patch('hobbie/list/:id')
   .get('/hobbie/list')
+
+// for diy product
+router
+  .post('/diy-product', uploadDIYProductThumbnail, addDIYProductController)
+  .patch('/diy-product/:id', uploadDIYProductThumbnail, updateDIYProductController)
+  .get('/diy-product', getDIYProductController)
+  .get('/diy-product/:id', getDIYProductByIdController)
+  .delete('/diy-product/:id', deleteDIYProductController)
+
 
 module.exports = router;

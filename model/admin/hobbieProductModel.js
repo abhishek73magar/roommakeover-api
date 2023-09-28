@@ -81,10 +81,17 @@ exports.getHobbieProductByIdModel = (id) => {
   return new Promise(async(resolve, reject) => {
     try { 
       const [hobbieProduct] = await knex('hobbie_products').where('id', id)
-      const productList = await knex('hobbie_product_list').where('hobbie_product_id', id)
       const query = `
-          
+          SELECT a.*, b.url,  from hobbie_product_list AS a
+          INNER JOIN product_images AS b ON a.product_id=b.product_id 
+          WHERE hobbie_product_id=?
         `
+    const { rows } = await knex.raw(query, [id])
+    const productList = rows.reduce((prev, curr) => {
+    const check = prev.some((item) => item.product_id === curr.product_id)
+    if(!check) prev.push(curr)
+    return prev;
+  }, [])
       return resolve({ hobbieProduct, productList })
     } catch (error) {
       console.log(error)
@@ -94,5 +101,5 @@ exports.getHobbieProductByIdModel = (id) => {
 }
 
 exports.deleteHobbieProductModel = (id) => {
-  return knex('hoobie-product').where('id', id).delete()
+  return knex('hoobie_product').where('id', id).delete()
 }
