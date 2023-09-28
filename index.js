@@ -15,26 +15,24 @@ app.use(cookieParser());
 app.use(express.static("public"));
 app.use(express.json());
 
-const corsOptions = {
-  origin: [
-    "http://localhost:3000",
-    "http://localhost:3001",
-    "http://localhost:3002",
-    "http://localhost:4000",
-    "https://online-shop-three-beryl.vercel.app",
-    "https://roommakeover.theminiland.com",
-  ],
-  credentials: true,
-}
+app.use(
+  cors({
+    origin: [
+      "http://localhost:3000",
+      "http://localhost:3001",
+      "http://localhost:3002",
+      "http://localhost:4000",
+      "https://online-shop-three-beryl.vercel.app",
+      "https://roommakeover.theminiland.com",
+      "https://admin.theminiland.com",
+    ],
+    credentials: true,
+  })
+);
+// app.use(auth);
+app.use((req, res, next) => { console.log(req.method, "-", req.url, "-", new Date().toISOString()); return next()})
+app.use('/api/admin', require("./router/adminRouter"))
+app.use("/api", auth, require("./router"));
 
-app.use((req, res, next) => {
-  // Remove the X-Served-By header
-  res.removeHeader('X-Served-By');
-  next();
-});
-
-app.use(cors(corsOptions));
-app.use(auth);
-app.use("/api", require("./router"));
 
 app.listen(port, () => console.log(`Server Start at ${port}`));

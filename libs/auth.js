@@ -11,7 +11,7 @@ exports.auth = async (req, res, next) => {
 
   const noAuth = ["/api/login", "/api/signin", "/api/loginwithsocial"];
 
-  console.log(method, "-", req.url, "-", new Date().toISOString());
+  
   req.role = "admin";
   const check = notAllowGet.some((item) => req.url.includes(item));
   // console.log(check);

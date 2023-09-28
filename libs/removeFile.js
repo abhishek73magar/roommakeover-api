@@ -2,7 +2,7 @@ const fs = require("fs");
 
 exports.removeFile = (path) => {
   try {
-    fs.unlinkSync(path);
+    fs.unlinkSync('public/' +path);
     return true;
   } catch (error) {
     return true;
