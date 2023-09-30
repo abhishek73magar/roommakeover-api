@@ -3,10 +3,10 @@ const jwt = require("jsonwebtoken");
 exports.auth = async (req, res, next) => {
   const method = req.method;
   const notAllowGet = [
-    "/api/checkout",
-    "/api/wishlist",
-    "/api/billingaddress",
-    "/api/community/user",
+    "/checkout",
+    "/wishlist",
+    "/billingaddress",
+    "/community/user",
   ];
 
   const noAuth = ["/api/login", "/api/signin", "/api/loginwithsocial"];
@@ -14,7 +14,7 @@ exports.auth = async (req, res, next) => {
   
   req.role = "admin";
   const check = notAllowGet.some((item) => req.url.includes(item));
-  // console.log(check);
+  // console.log(check, req.url);
   if (noAuth.includes(req.url)) return next();
   if (method === "GET" && !check) return next();
 
