@@ -2,14 +2,9 @@ const jwt = require("jsonwebtoken");
 
 exports.auth = async (req, res, next) => {
   const method = req.method;
-  const notAllowGet = [
-    "/checkout",
-    "/wishlist",
-    "/billingaddress",
-    "/community/user",
-  ];
+  const notAllowGet = ["/checkout", "/wishlist", "/billingaddress", "/community/user"];
 
-  const noAuth = ["/api/login", "/api/signin", "/api/loginwithsocial"];
+  const noAuth = ["/login", "/signin", "/loginwithsocial"];
 
   
   req.role = "admin";

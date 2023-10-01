@@ -3,8 +3,6 @@ require("./db");
 const express = require("express");
 const app = express();
 const cors = require("cors");
-const http = require("http");
-const corsList = process.env.urlList || [];
 //const server = http.createServer(server);
 const cookieParser = require("cookie-parser");
 const { auth } = require("./libs/auth");
