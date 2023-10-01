@@ -23,7 +23,7 @@ app.use(
       "https://online-shop-three-beryl.vercel.app",
       "https://roommakeover.theminiland.com",
       "https://admin.theminiland.com",
-      "http://78.46.201.98:9000"
+      "http://78.46.201.98:9002"
     ],
     credentials: true,
   })
