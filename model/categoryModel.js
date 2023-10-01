@@ -6,16 +6,12 @@ exports.addCategoryModel = (body, file) => {
     try {
       body.imagesrc = "";
       // console.log(body, file);
-      if (file) {
-        body.imagesrc = `categorysbg/${file.filename}`;
-      }
+      if (file) { body.imagesrc = `categorysbg/${file.filename}` }
+      console.log(body)
       await knex("categorys").insert(body);
       return resolve("New Category added");
     } catch (error) {
-      if (file) {
-        const path = `categorybg/${path}`;
-        removeFile(path);
-      }
+      if (file) { removeFile(`categorybg/${file.filename}`) }
       console.log(error);
       return reject(error);
     }

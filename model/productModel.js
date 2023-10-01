@@ -179,11 +179,9 @@ exports.deleteProductModel = (pid) => {
       const images = await knex("product_images").where("product_id", pid);
 
       await knex("product_images").where("product_id", pid).delete();
-      images.forEach((image) => {
-        removeFile(image.url);
-      });
-
+      images.forEach((image) => { removeFile(image.url) });
       await knex("products").where("product_id", pid).delete();
+      
       return resolve("Product Removed");
     } catch (error) {
       return reject(error);

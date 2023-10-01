@@ -1,5 +1,6 @@
 const { uid } = require("uid");
 const knex = require("../../db");
+const { removeFile } = require("../../libs/removeFile");
 
 exports.addProductForAdminModel = (body, files) => {
   return new Promise (async(resolve, reject) => {
@@ -51,11 +52,10 @@ exports.updateProductForAdminModel = (body, files, pid) => {
 
       const obj = { ...body, update_date: new Date().toISOString() };
       await tnx("products").where("pid", pid).update(obj);
-      tnx.commit();
+      await tnx.commit();
+      return resolve("Product updated")
     } catch (error) {
       return reject(error)
-    }finally{
-      return resolve("Product updated")
     }
   })
 }
@@ -136,11 +136,10 @@ exports.deleteProductForAdminModel = (pid) => {
       const images = await knex("product_images").where("product_id", pid);
 
       // await tnx("product_images").where("product_id", pid).delete();
+      console.log(pid)
       await tnx("products").where("pid", pid).delete();
 
-      images.forEach((image) => {
-        removeFile(image.url);
-      });
+      images.forEach((image) => { removeFile(image.url) });
       await tnx.commit();
       return resolve("Product Removed");
     } catch (error) {
