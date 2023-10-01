@@ -131,20 +131,22 @@ exports.getProductSingleImageModel = (body) => {
 
 exports.deleteProductForAdminModel = (pid) => {
   return new Promise(async (resolve, reject) => {
-    const tnx = await tnx.transaction();
+    const tnx = await knex.transaction();
     try {
       const images = await knex("product_images").where("product_id", pid);
 
-      await tnx("product_images").where("product_id", pid).delete();
-      await tnx("products").where("product_id", pid).delete();
+      // await tnx("product_images").where("product_id", pid).delete();
+      await tnx("products").where("pid", pid).delete();
+
       images.forEach((image) => {
         removeFile(image.url);
       });
-      tnx.commit();
-    } catch (error) {
-      return reject(error);
-    }finally{
+      await tnx.commit();
       return resolve("Product Removed");
+    } catch (error) {
+      await tnx.rollback();
+      console.log(error)
+      return reject(error);
     }
   });
 };

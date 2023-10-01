@@ -5,7 +5,7 @@ exports.addHobbieForAdminModel = (body, files) => {
   return new Promise(async(resolve, reject) => {
     try {
       const obj = { ...body }
-      const [hobbie] = await knex('hobbies').where('title', body.title)
+      const [hobbie] = await knex('hobbies').where('name', body.name)
       if(hobbie) return reject("Hobbie name already exist !")
 
       if(files && Array.isArray(files) && files.length !== 0) {
