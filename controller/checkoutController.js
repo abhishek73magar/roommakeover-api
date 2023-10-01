@@ -4,6 +4,7 @@ const {
   updateCheckoutModel,
   deleteCheckoutModel,
   removeCheckoutModel,
+  addMultipleProductAsCheckoutModel,
 } = require("../model/checkoutModel");
 
 exports.addCheckoutController = (req, res) => {
@@ -11,6 +12,12 @@ exports.addCheckoutController = (req, res) => {
     .then((message) => res.status(200).json({ message }))
     .catch((err) => res.status(400).send(err));
 };
+
+exports.addMultipleProductAsCheckoutController = (req, res) => {
+  addMultipleProductAsCheckoutModel(req.body, req.user)
+    .then((message) => res.status(200).json({ message }))
+    .catch((err) => res.status(400).send(err));
+}
 
 exports.updateCheckoutContoller = (req, res) => {
   updateCheckoutModel(req.body, req.params.id)

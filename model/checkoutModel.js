@@ -16,6 +16,7 @@ exports.addCheckoutModel = (body, user) => {
       }
 
       body.id = uid(10);
+      body.user_id = user.id
       await knex("checkout").insert(body);
       return resolve("Product added for checkout");
     } catch (error) {
@@ -23,6 +24,40 @@ exports.addCheckoutModel = (body, user) => {
     }
   });
 };
+
+exports.addMultipleProductAsCheckoutModel = (body, user) => {
+  return new Promise(async(resolve, reject) => {
+    const tnx = await knex.transaction();
+    try {
+      const checkoutProduct = await knex('checkout').where('user_id', user.id)
+      const removeIds = []
+      const changeAbleProduct = body.reduce((prev, item) => {
+        const product = checkoutProduct.find((i) => i.product_id === item.product_id)
+        // console.log(product)
+        if(product){
+          item.qty = item.qty + +product.qty
+          removeIds.push(product.id) 
+        } else {
+          item.id = uid(10)
+          item.user_id = user.id;
+        }
+
+        prev.push(item)
+        return prev;
+      }, [])
+
+      if(removeIds.length !== 0) await tnx('checkout').whereIn('id', removeIds).delete();
+      if(changeAbleProduct.length !== 0) await tnx("checkout").insert(changeAbleProduct);
+      await tnx.commit();
+      return resolve("Product added for checkout");
+      
+    } catch (error) {
+      console.log(error)
+      await tnx.rollback();
+      return reject(error)
+    }
+  })
+}
 
 exports.updateCheckoutModel = (body, id) => {
   return new Promise(async (resolve, reject) => {
@@ -45,10 +80,7 @@ exports.getCheckoutModel = (user) => {
 
       for (let i = 0; i < products.length; i++) {
         const product = products[i];
-        const [image] = await knex("product_images").where(
-          "product_id",
-          product.pid
-        );
+        const [image] = await knex("product_images").where("product_id", product.pid);
         product.url = image.url;
         product.alt = image.originalname;
       }

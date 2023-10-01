@@ -260,7 +260,7 @@ exports.topSellingProductModel = (total = 7) => {
       let products = await knex("products")
         .whereIn("pid", sortData)
         .andWhere("status", "published")
-        .select("id", "pid", "title", "price", "on_sale", "category");
+        .select("id", "pid", "title", "price", "on_sale", "category_id");
       for (let i = 0; i < products.length; i++) {
         const product = products[i];
         const [image] = await knex("product_images").where(

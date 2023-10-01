@@ -42,9 +42,51 @@ exports.getHobbieModel = () => {
   return knex("hobbies");
 };
 
-exports.getHobbieByIdModel = (id) => {
-  return knex("hobbies").where("id", id);
+exports.getHobbieByNameModel = (name) => {
+  return new Promise(async(resolve, reject) => {
+    try {
+      const query = `
+          SELECT b.* FROM hobbies as a
+          INNER JOIN hobbie_products as b ON a.id=b.hobbie_id WHERE LOWER(a.name) LIKE LOWER('%${name}%')
+        `      
+      const { rows } = await knex.raw(query);
+      return resolve(rows)
+    } catch (error) {
+      console.log(error)
+      return reject(error)
+    }
+  })
 };
+
+exports.getHobbieProductByTitleModel = (title) => {
+  return new Promise(async(resolve, reject) => {
+    try {
+      const [response] = await knex("hobbie_products").where('title', title.replace(/-/g, ' '))
+      if(!response) return reject("Hobbie not found !")
+
+      const query = `
+        SELECT a.*, b.price, b.pid, c.url, c.originalname FROM hobbie_product_list AS a
+        INNER JOIN products AS b ON a.product_id=b.pid
+        INNER JOIN product_images AS C ON a.product_id=c.product_id  
+        WHERE a.hobbie_product_id=?
+      `
+
+      const { rows } = await knex.raw(query, [response.id])
+
+      const products = rows.reduce((prev, item) => {
+        const check = prev.some((i) => i.product_id === item.product_id);
+        if(!check) prev.push(item)
+        return prev;
+      }, [])  
+
+      return resolve({ hobbie: response, products })
+
+    } catch (error) {
+      console.log(error)
+      return reject(error)
+    }
+  })
+}
 
 exports.deleteHobbieModel = (id) => {
   return knex("hoobies_list").where("id", id).delete();

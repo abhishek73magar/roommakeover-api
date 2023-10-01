@@ -36,6 +36,7 @@ const {
   getCheckoutController,
   deleteCheckoutController,
   removeCheckoutController,
+  addMultipleProductAsCheckoutController,
 } = require("./controller/checkoutController");
 const {
   addCommunityImages,
@@ -50,8 +51,9 @@ const {
   addHobbieController,
   updateHobbieController,
   getHobbieController,
-  getHobbieByIdController,
+  getHobbieByNameController,
   deleteHobbieController,
+  getHobbieProductByTitleController,
 } = require("./controller/hobbieController");
 const {
   addOrderController,
@@ -158,6 +160,7 @@ router
 // checkout
 router
   .post("/checkout", addCheckoutController)
+  .post('/checkout/multiple-product', addMultipleProductAsCheckoutController)
   .patch("/checkout/:id", updateCheckoutContoller)
   .get("/checkout", getCheckoutController)
   .get("/checkout/:userid")
@@ -216,8 +219,9 @@ router
 router
   .post("/hobbies", uploadHobbieImages, addHobbieController)
   .patch("/hobbies/:id", uploadHobbieImages, updateHobbieController)
-  .get("/hobbies", getHobbieController)
-  .get("/hobbies/:id", getHobbieByIdController)
+  .get("/hobbie", getHobbieController)
+  .get("/hobbie/:name", getHobbieByNameController)
+  .get('/hobbie/product/:title', getHobbieProductByTitleController)
   .delete("/hobbies/:id", deleteHobbieController);
 
 // banners

@@ -4,8 +4,9 @@ const {
   addHobbieModel,
   updateHobbieModel,
   getHobbieModel,
-  getHobbieByIdModel,
+  getHobbieByNameModel,
   deleteHobbieModel,
+  getHobbieProductByTitleModel,
 } = require("../model/hobbieModel");
 
 exports.uploadHobbieImages = multer({
@@ -31,11 +32,17 @@ exports.getHobbieController = (req, res) => {
     .catch((err) => res.status(400).send(err));
 };
 
-exports.getHobbieByIdController = (req, res) => {
-  getHobbieByIdModel(req.params.id)
-    .then((data) => res.status(200).json(data[0]))
+exports.getHobbieByNameController = (req, res) => {
+  getHobbieByNameModel(req.params.name)
+    .then((data) => res.status(200).json(data))
     .catch((err) => res.status(400).send(err));
 };
+
+exports.getHobbieProductByTitleController =(req, res) => {
+  getHobbieProductByTitleModel(req.params.title)
+    .then(data => res.status(200).json(data))
+    .catch(err => res.status(400).send(err))
+}
 
 exports.deleteHobbieController = (req, res) => {
   deleteHobbieModel(req.params.id)
