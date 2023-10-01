@@ -24,14 +24,11 @@ exports.getWishlistModel = (user) => {
       const products = await knex("wishlist as a")
         .leftJoin("products as b", "a.product_id", "b.pid")
         .where("a.user_id", user.id)
-        .select("a.*", "b.pid", "b.title", "b.price", "b.category");
+        .select("a.*", "b.pid", "b.title", "b.price");
 
       for (let i = 0; i < products.length; i++) {
         const product = products[i];
-        const [image] = await knex("product_images").where(
-          "product_id",
-          product.pid
-        );
+        const [image] = await knex("product_images").where("product_id", product.pid);
         product.url = image.url;
       }
 
