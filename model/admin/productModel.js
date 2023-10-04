@@ -7,16 +7,16 @@ exports.addProductForAdminModel = (body, files) => {
     const pid = uid(10);
     const tnx = await knex.transaction();
     try {
+      const [product] = await tnx('products').insert({pid, ...body}).returning('id')
       if (files && Array.isArray(files) && files.length !== 0) {
         const fileList = files.map((file) => {
           const name = file.filename;
           const url = "products/" + name;
           const originalname = file.originalname;
-          return { name, url, originalname, product_id: pid };
+          return { name, url, originalname, product_id: product.pid };
         });
         await tnx("product_images").insert(fileList)
       }
-      await tnx('products').insert({pid, ...body})
       tnx.commit();
 
     } catch (error) {
