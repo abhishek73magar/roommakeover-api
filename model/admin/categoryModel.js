@@ -9,8 +9,8 @@ exports.addCategoryForAdminModel = (body, file) => {
       if (file) { body.imagesrc = `categorysbg/${file.filename}` }
       if(body.category_id === '') body.category_id = null;
 
-      await knex("categorys").insert(body);
-      return resolve("New Category added");
+      const response = await knex("categorys").insert(body).returning("*");
+      return resolve(response);
     } catch (error) {
       if (file) { removeFile(`categorybg/${file.filename}`) }
       console.log(error);

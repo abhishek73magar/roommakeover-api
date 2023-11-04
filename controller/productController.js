@@ -13,6 +13,7 @@ const {
   getSearchProductModel,
   getProductByPIDModel,
   deleteProdcutImageModel,
+  getProductByCategoryNameModel,
 } = require("../model/productModel");
 
 exports.uploadProductImage = multer({
@@ -43,6 +44,12 @@ exports.getProductByTablenameController = (req, res) => {
     .then((data) => res.status(200).json(data))
     .catch((err) => res.status(400).send(err));
 };
+
+exports.getProductByCategoryNameController = (req, res) => {
+  getProductByCategoryNameModel(req.params.name)
+    .then(data => res.status(200).json(data))
+    .catch(err => res.status(400).send(err))
+}
 
 exports.updateProductController = (req, res) => {
   updateProductModel(req.body, req.files, req.params.pid)

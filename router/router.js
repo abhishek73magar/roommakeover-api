@@ -75,6 +75,7 @@ const {
   getSearchProductController,
   getProductByPIDController,
   deleteProductImageController,
+  getProductByCategoryNameController,
 } = require("../controller/productController");
 const {
   getReviewController,
@@ -115,6 +116,7 @@ router.get("/test", (req, res) => res.send("api is running"));
 // products
 router
   .post("/product", uploadProductImage, addProductController)
+  .get("/product/category/:name", getProductByCategoryNameController)
   .patch("/product/:pid", uploadProductImage, updateProductController)
   .get('/product/pid/:pid', getProductByPIDController)
   .get("/product/tablename/:colname/:value", getProductByTablenameController)

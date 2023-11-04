@@ -109,10 +109,7 @@ exports.getProductByTablenameModel = (params, role) => {
 
       for (let i = 0; i < products.length; i++) {
         const product = products[i];
-        let images = await knex("product_images").where(
-          "product_id",
-          product.pid
-        );
+        let images = await knex("product_images").where("product_id", product.pid);
         if (images) {
           product.images = images;
           product.url = images[0].url;
@@ -192,11 +189,7 @@ exports.deleteProductModel = (pid) => {
 exports.productImageModel = (pid) => {
   return new Promise(async (resolve, reject) => {
     try {
-      let images = knex("product_images as a").leftJoin(
-        "products as b",
-        "a.product_id",
-        "b.pid"
-      );
+      let images = knex("product_images as a").leftJoin("products as b", "a.product_id", "b.pid");
       if (pid !== "all") images = images.where("product_id", pid);
 
       images = await images.select("a.*", "b.title");
@@ -230,6 +223,31 @@ exports.totalProductsModel = () => {
     }
   });
 };
+
+exports.getProductByCategoryNameModel = (name) => {
+  return new Promise(async(resolve, reject) => {
+    try {
+      const cateogryName = name.replace(/-/g, ' ');
+      const products = await knex('categorys as a').join("products as b", "a.id", "=", "b.category_id")
+      .whereILike('a.name', `%${cateogryName}%`)
+      
+      for (let i = 0; i < products.length; i++) {
+        const product = products[i];
+        let images = await knex("product_images").where("product_id", product.pid);
+        if (images && Array.isArray(images) && images.length !== 0) {
+          product.images = images;
+          product.url = images[0].url;
+          product.alt = images[0].originalname;
+        }
+      }
+
+      return resolve(products)
+    } catch (error) {
+      console.log(error)
+      return reject(error)
+    }
+  })
+}
 
 exports.topSellingProductModel = (total = 7) => {
   return new Promise(async (resolve, reject) => {

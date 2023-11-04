@@ -15,7 +15,7 @@ exports.uploadCategoryForAdminImage = multer({
 
 exports.addCategoryForAdminController = (req, res) => {
   addCategoryForAdminModel(req.body, req.file)
-    .then((message) => res.status(201).json({ message }))
+    .then((data) => res.status(201).json(data))
     .catch((err) => res.status(400).send(err));
 };
 
