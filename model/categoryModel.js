@@ -57,6 +57,10 @@ exports.getCategoryByIdModel = (id) => {
   });
 };
 
+exports.getCategoryByNameModel = (name) => {
+  return knex('categorys').whereILike("name", `%${name}%`)
+}
+
 exports.deleteCategoryModel = (id) => {
   return new Promise(async (resolve, reject) => {
     try {

@@ -8,7 +8,7 @@ exports.fileUpload = (dest) => {
       const newDate = Date.now().toString();
       const extn = path.extname(file.originalname);
       const name = file.originalname.replace(extn, "");
-      let filename = `${name}_${newDate.slice(7, 13)}${extn}`;
+      let filename = `${name.replace(/ /g, '_')}_${newDate.slice(7, 13)}${extn}`;
       return cb(null, filename.toLowerCase());
     },
   });

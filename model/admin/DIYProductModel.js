@@ -12,8 +12,9 @@ exports.addDIYProductModel = (body, file) => {
       const [diy_product] = await tnx('diy_products').insert(body).returning("id")
       
       products = products.map((product_id) => {
-        return { product_id, diy_product_id: diy_product.id }
+        return { product_id, diy_id: diy_product.id }
       })
+
       await tnx('diy_product_list').insert(products)
 
       await tnx.commit();
@@ -31,18 +32,18 @@ exports.updateDIYProductModel = (body, file, id) => {
     const tnx = await knex.transaction();
     try {
       if(file) { body.thumbnail = `DIY-products/` + file.originalname }      
-      const productList = await knex('diy_product_list').where('diy_product_id', id)
+      const productList = await knex('diy_product_list').where('diy_id', id)
       let products = JSON.parse(body.products);
 
       const removeProduct = productList.reduce((prev, curr) => {
-        const check = products.some(i => i.diy_product_id === curr.id);
+        const check = products.some(i => i.diy_id === curr.id);
         if(!check) { prev.push(curr.id) }
         return prev;
       }, [])
       
       const newProduct = products.reduce((prev, product_id) => {
         const check = productList.some(item => item.id === product_id)
-        if(!check) { prev.push({ product_id, diy_product_id: id }) }
+        if(!check) { prev.push({ product_id, diy_id: id }) }
         return prev;
       }, [])
 
