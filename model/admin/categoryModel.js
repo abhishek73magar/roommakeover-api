@@ -23,7 +23,7 @@ exports.updateCategoryForAdminModel = (body, file, id) => {
   return new Promise(async (resolve, reject) => {
     try {
       
-      if(body.category_id === '') body.category_id = null;
+      if(body.category_id === '' || body.category_id === 'null') body.category_id = null;
       if (file) {
         body.imagesrc = `categorysbg/${file.filename}`;
         const [category] = await knex("categorys").where("id", id);
