@@ -5,7 +5,7 @@ exports.addCategoryForAdminModel = (body, file) => {
   return new Promise(async (resolve, reject) => {
     try {
       body.imagesrc = "";
-      // console.log(body, file);
+
       if (file) { body.imagesrc = `categorysbg/${file.filename}` }
       if(body.category_id === '') body.category_id = null;
 
@@ -22,6 +22,7 @@ exports.addCategoryForAdminModel = (body, file) => {
 exports.updateCategoryForAdminModel = (body, file, id) => {
   return new Promise(async (resolve, reject) => {
     try {
+      
       if(body.category_id === '') body.category_id = null;
       if (file) {
         body.imagesrc = `categorysbg/${file.filename}`;
