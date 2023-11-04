@@ -1,14 +1,14 @@
-const knex = require("../db");
-const { removeFile } = require("../libs/removeFile");
+const knex = require("../../db");
+const { removeFile } = require("../../libs/removeFile");
 
-exports.addCategoryModel = (body, file) => {
+exports.addCategoryForAdminModel = (body, file) => {
   return new Promise(async (resolve, reject) => {
     try {
       body.imagesrc = "";
       // console.log(body, file);
       if (file) { body.imagesrc = `categorysbg/${file.filename}` }
       if(body.category_id === '') body.category_id = null;
-      
+
       await knex("categorys").insert(body);
       return resolve("New Category added");
     } catch (error) {
@@ -19,13 +19,12 @@ exports.addCategoryModel = (body, file) => {
   });
 };
 
-exports.updateCategoryModel = (body, file, id) => {
+exports.updateCategoryForAdminModel = (body, file, id) => {
   return new Promise(async (resolve, reject) => {
     try {
       if(body.category_id === '') body.category_id = null;
       if (file) {
         body.imagesrc = `categorysbg/${file.filename}`;
-        if(body.category_id === '') body.category_id = null;
         const [category] = await knex("categorys").where("id", id);
         removeFile(category.imagesrc);
       }
@@ -42,11 +41,11 @@ exports.updateCategoryModel = (body, file, id) => {
   });
 };
 
-exports.getCategoryModel = () => {
+exports.getCategoryForAdminModel = () => {
   return knex("categorys");
 };
 
-exports.getCategoryByIdModel = (id) => {
+exports.getCategoryForAdminByIdModel = (id) => {
   return new Promise(async (resolve, reject) => {
     try {
       const [category] = await knex("categorys").where("id", id);
@@ -57,7 +56,7 @@ exports.getCategoryByIdModel = (id) => {
   });
 };
 
-exports.deleteCategoryModel = (id) => {
+exports.deleteCategoryForAdminModel = (id) => {
   return new Promise(async (resolve, reject) => {
     try {
       const [category] = await knex("categorys").where("id", id);

@@ -1,4 +1,4 @@
-const { getOrderForAdminModel, updateOrderForAdminModel, getOrderByIdForAdminModel } = require("../../model/admin/orderModule")
+const { getOrderForAdminModel, updateOrderForAdminModel, getOrderByIdForAdminModel } = require("../../model/admin/orderModel")
 
 exports.getOrderForAdminController = (req, res) => {
   getOrderForAdminModel()
