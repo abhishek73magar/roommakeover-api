@@ -1,4 +1,4 @@
-const { uploadCategoryImage, deleteAdminCategoryController, getAdminCateogryByIdController, getAdminCategoryController, updateAdminCategoryController, addAdminCategoryController } = require('../controller/admin/categoryController');
+const { uploadCategoryForAdminImage, addCategoryForAdminController, updateCategoryForAdminController, getCategoryForAdminController, getCategoryByIdForAdminController, deleteCategoryForAdminController } = require('../controller/admin/categoryController');
 const { uploadDIYProductThumbnail, addDIYProductController, getDIYProductController, updateDIYProductController, deleteDIYProductController, getDIYProductByIdController } = require('../controller/admin/diyProductController');
 const { uploadHobbieThumbnail, addHobbieForAdminController, updateHobbieForAdminController, getHobbieForAdminController, getHobbieByIdForAdminController, deleteHobbieForAdminController } = require('../controller/admin/hobbieController');
 const { addHobbieProductController, updateHobbieProductController, uploadHobbieProductThumbnail, getHobbieProductController, getHobbieProductByIdController, deleteHobbieProductController } = require('../controller/admin/hobbieProductController');
@@ -8,7 +8,7 @@ const { addProductForAdminController, uploadProductImage, updateProductForAdminC
 const router = require('express').Router();
 
 
-// for product
+// // for product
 router
   .post('/product', uploadProductImage, addProductForAdminController)
   .patch('/product/:pid', uploadProductImage, updateProductForAdminController)
@@ -17,17 +17,8 @@ router
   .get('/product/page/:total', getProductForAdminController)
   .get('/product/page/:total/:pagenumber', getProductForAdminController)
   .get('/product/:pid', getProductByPIDForAdminController)
-  .delete('/product/:pid', deleteProductForAdminController)
+  .delete('/product/:pid', deleteProductForAdminController);
 
-// for categories
-// cateogrys
-router
-  .post("/category", uploadCategoryImage, addAdminCategoryController)
-  .patch("/category/:id", uploadCategoryImage, updateAdminCategoryController)
-  .get("/category", getAdminCategoryController)
-  .get("/category/:id", getAdminCateogryByIdController)
-  .delete("/category/:id", deleteAdminCategoryController)
-  .get("/topsellingcategory");
 
 // for orders 
 router
@@ -50,7 +41,7 @@ router
   .post("/category", uploadCategoryForAdminImage, addCategoryForAdminController)
   .patch("/category/:id", uploadCategoryForAdminImage, updateCategoryForAdminController)
   .get("/category", getCategoryForAdminController)
-  .get("/category/:id", getCateogryByIdForAdminController)
+  .get("/category/:id", getCategoryByIdForAdminController)
   .delete("/category/:id", deleteCategoryForAdminController)
   
 
