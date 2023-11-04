@@ -5,7 +5,7 @@ const {
   getBannerController,
   deleteBannerController,
   getBannerByTypeController,
-} = require("./controller/bannerController");
+} = require("../controller/bannerController");
 const {
   addBillingAddressController,
   updateBillingAddressController,
@@ -13,7 +13,7 @@ const {
   getActiveBillingAddressController,
   getBillingAddressByIdController,
   deleteBillingAddressController,
-} = require("./controller/billingAddressController");
+} = require("../controller/billingAddressController");
 const {
   uploadBrandImage,
   addBrandController,
@@ -21,7 +21,7 @@ const {
   getBrandController,
   getBrandByIdController,
   deleteBrandController,
-} = require("./controller/brandController");
+} = require("../controller/brandController");
 const {
   addCategoryController,
   updateCategoryController,
@@ -29,7 +29,7 @@ const {
   deleteCategoryController,
   getCateogryByIdController,
   uploadCategoryImage,
-} = require("./controller/categoryController");
+} = require("../controller/categoryController");
 const {
   addCheckoutController,
   updateCheckoutContoller,
@@ -37,7 +37,7 @@ const {
   deleteCheckoutController,
   removeCheckoutController,
   addMultipleProductAsCheckoutController,
-} = require("./controller/checkoutController");
+} = require("../controller/checkoutController");
 const {
   addCommunityImages,
   addCommunityPostController,
@@ -45,7 +45,7 @@ const {
   getCommunityPostController,
   getCommunityPostByTableNameController,
   deleteCommunityPostController,
-} = require("./controller/communityPostController");
+} = require("../controller/communityPostController");
 const {
   uploadHobbieImages,
   addHobbieController,
@@ -54,13 +54,13 @@ const {
   getHobbieByNameController,
   deleteHobbieController,
   getHobbieProductByTitleController,
-} = require("./controller/hobbieController");
+} = require("../controller/hobbieController");
 const {
   addOrderController,
   getOrdersController,
   getOrderByIdController,
   updateOrderController,
-} = require("./controller/orderController");
+} = require("../controller/orderController");
 const {
   getProductController,
   uploadProductImage,
@@ -75,20 +75,20 @@ const {
   getSearchProductController,
   getProductByPIDController,
   deleteProductImageController,
-} = require("./controller/productController");
+} = require("../controller/productController");
 const {
   getReviewController,
   getReviewByProductIdController,
   deleteReviewController,
   updateReviewController,
   addReviewConttroller,
-} = require("./controller/reviewController");
+} = require("../controller/reviewController");
 const {
   uploadSliderImage,
   addSliderImageController,
   getSliderImageController,
   deleteSliderImageController,
-} = require("./controller/sliderImageController");
+} = require("../controller/sliderImageController");
 const {
   signUpUserController,
   loginUserController,
@@ -98,7 +98,7 @@ const {
   logOutUserController,
   loginWithSocialController,
   verifyUserController,
-} = require("./controller/userController");
+} = require("../controller/userController");
 const {
   addWishlistController,
   updateWishlistController,
@@ -106,7 +106,7 @@ const {
   getWishlistByIdController,
   deleteWishlistController,
   removeWishlistController,
-} = require("./controller/wishlistController");
+} = require("../controller/wishlistController");
 
 const router = require("express").Router();
 

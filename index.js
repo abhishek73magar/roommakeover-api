@@ -32,7 +32,7 @@ app.use(
 // app.use(auth);
 app.use((req, res, next) => { console.log(req.method, "-", req.url, "-", new Date().toISOString()); return next()})
 app.use('/api/admin', require("./router/adminRouter"))
-app.use("/api", auth, require("./router"));
+app.use("/api", auth, require("./router/router"));
 
 
 app.listen(port, () => console.log(`Server Start at ${port}`));

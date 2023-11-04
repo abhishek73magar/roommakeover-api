@@ -1,4 +1,4 @@
-const { uploadCategoryForAdminImage, addCategoryForAdminController, updateCategoryForAdminController, getCategoryForAdminController, deleteCategoryForAdminController, getCateogryByIdForAdminController } = require('../controller/admin/categoryModel');
+const { uploadCategoryImage, deleteAdminCategoryController, getAdminCateogryByIdController, getAdminCategoryController, updateAdminCategoryController, addAdminCategoryController } = require('../controller/admin/categoryController');
 const { uploadDIYProductThumbnail, addDIYProductController, getDIYProductController, updateDIYProductController, deleteDIYProductController, getDIYProductByIdController } = require('../controller/admin/diyProductController');
 const { uploadHobbieThumbnail, addHobbieForAdminController, updateHobbieForAdminController, getHobbieForAdminController, getHobbieByIdForAdminController, deleteHobbieForAdminController } = require('../controller/admin/hobbieController');
 const { addHobbieProductController, updateHobbieProductController, uploadHobbieProductThumbnail, getHobbieProductController, getHobbieProductByIdController, deleteHobbieProductController } = require('../controller/admin/hobbieProductController');
@@ -18,6 +18,16 @@ router
   .get('/product/page/:total/:pagenumber', getProductForAdminController)
   .get('/product/:pid', getProductByPIDForAdminController)
   .delete('/product/:pid', deleteProductForAdminController)
+
+// for categories
+// cateogrys
+router
+  .post("/category", uploadCategoryImage, addAdminCategoryController)
+  .patch("/category/:id", uploadCategoryImage, updateAdminCategoryController)
+  .get("/category", getAdminCategoryController)
+  .get("/category/:id", getAdminCateogryByIdController)
+  .delete("/category/:id", deleteAdminCategoryController)
+  .get("/topsellingcategory");
 
 // for orders 
 router
