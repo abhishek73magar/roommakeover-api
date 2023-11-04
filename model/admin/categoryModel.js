@@ -46,7 +46,7 @@ exports.getCategoryForAdminModel = () => {
   return knex("categorys");
 };
 
-exports.getCategoryForAdminByIdModel = (id) => {
+exports.getCategoryByIdForAdminModel = (id) => {
   return new Promise(async (resolve, reject) => {
     try {
       const [category] = await knex("categorys").where("id", id);
