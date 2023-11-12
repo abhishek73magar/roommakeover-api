@@ -43,7 +43,11 @@ exports.updateCategoryModel = (body, file, id) => {
 };
 
 exports.getCategoryModel = () => {
-  return knex("categorys");
+  return knex("categorys").then((res) => {
+    const gift = res.find((item)=> item.name.toLowerCase() === 'gifts')
+    if(gift) { return res.filter((item) => item.category_id !== gift.id)}
+    else { return res }
+  });
 };
 
 exports.getCategoryByIdModel = (id) => {
@@ -59,6 +63,22 @@ exports.getCategoryByIdModel = (id) => {
 
 exports.getCategoryByNameModel = (name) => {
   return knex('categorys').whereILike("name", `%${name}%`)
+}
+
+exports.getSubCategoryByName = (name) => {
+  return new Promise(async(resolve, reject) => {
+    try {
+      const category = await knex('categorys').whereILike('name', `%${name}%`)
+      if(category.length !== 0) {
+        const subCategorys = await knex('categorys').whereIn('category_id', category.map((i) => i.id))
+        return resolve(subCategorys)
+      }
+
+      return resolve([])
+    } catch (error) {
+      return reject(error)
+    }
+  })
 }
 
 exports.deleteCategoryModel = (id) => {

@@ -5,6 +5,7 @@ const {
   getCategoryModel,
   deleteCategoryModel,
   getCategoryByIdModel,
+  getSubCategoryByName,
 } = require("../model/categoryModel");
 const { fileUpload, imageFilter } = require("../libs/fileUpload");
 
@@ -36,6 +37,12 @@ exports.getCateogryByIdController = (req, res) => {
     .then((data) => res.status(200).json(data))
     .catch((err) => res.status(400).send(err));
 };
+
+exports.getSubCategoryByNameController = (req, res) => {
+  getSubCategoryByName(req.params.name)
+    .then(data => res.status(200).json(data))
+    .catch(err => res.status(400).send(err))
+}
 
 exports.deleteCategoryController = (req, res) => {
   deleteCategoryModel(req.params.id)

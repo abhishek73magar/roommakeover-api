@@ -13,6 +13,7 @@ app.use(cookieParser());
 app.use("/api/image", express.static("public"));
 app.use(express.json());
 
+
 app.use(
   cors({
     origin: [
