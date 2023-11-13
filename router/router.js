@@ -85,6 +85,7 @@ const {
   updateReviewController,
   addReviewConttroller,
 } = require("../controller/reviewController");
+const { uploadShareProduct, addShareProductController, getShareProductByIdController, updateShareProductController, deleteShareProductController } = require("../controller/shareProductController");
 const {
   uploadSliderImage,
   addSliderImageController,
@@ -243,25 +244,20 @@ router
   .get("/community", getCommunityPostController)
   .get("/community/client/:noofpage", getCommunityPostController)
   .get("/community/client/:noofpage/:pagenumber", getCommunityPostController)
-  .get(
-    "/community/tablename/:colname/:value",
-    getCommunityPostByTableNameController
-  )
-
-  .get(
-    "/community/user/tablename/:colname/:value",
-    getCommunityPostByTableNameController
-  )
+  .get("/community/tablename/:colname/:value", getCommunityPostByTableNameController)
+  .get("/community/user/tablename/:colname/:value", getCommunityPostByTableNameController)
   .get("/community/user", getCommunityPostController)
   .get("/community/user/:noofpage", getCommunityPostController)
   .get("/community/user/:noofpage/:pagenumber", getCommunityPostController)
   .delete("/community/:id", deleteCommunityPostController);
 
-// our community orders
+// get share product for 
 router
-  .post("/community-order")
-  .patch("/community-order/:id")
-  .get("/community-order")
-  .get("/community-order/:pid");
+  .get('/share-product/user')
+  .get("/share-product")
+  .get("/share-product/:id", getShareProductByIdController)
+  .post("/share-product", uploadShareProduct, addShareProductController)
+  .patch("/share-product/:id", uploadShareProduct, updateShareProductController)
+  .delete("/share-product", deleteShareProductController)
 
 module.exports = router;

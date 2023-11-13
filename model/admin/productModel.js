@@ -5,7 +5,7 @@ const { removeFile } = require("../../libs/removeFile");
 exports.addProductForAdminModel = (body, files) => {
   return new Promise (async(resolve, reject) => {
     const pid = uid(10);
-    const tnx = await knex.transaction();
+    const tnx = knex.transaction();
     try {
       await tnx('products').insert({pid, ...body})
       if (files && Array.isArray(files) && files.length !== 0) {
@@ -17,11 +17,11 @@ exports.addProductForAdminModel = (body, files) => {
         });
         await tnx("product_images").insert(fileList)
       }
-      tnx.commit();
+      await tnx.commit();
 
     } catch (error) {
       console.log(error)
-      tnx.rollback();
+      await tnx.rollback();
       if (files) {
         files.forEach(({ filename }) => {
           const path = `product/${filename}`;

@@ -11,6 +11,7 @@ const expireDate = moment().add(1, "day").unix();
 
 exports.signUpUserModel = (body, res) => {
   return new Promise(async (resolve, reject) => {
+    const tnx = await knex.transaction();
     try {
       const id = uid(16);
       const email = body.email;
@@ -22,28 +23,16 @@ exports.signUpUserModel = (body, res) => {
       body.password = bcrypt.hashSync(body.password, salt);
 
       const obj = { ...body, id };
-      await knex.transaction((trx) => {
-        return knex("users")
-          .transacting(trx)
-          .insert(obj)
-          .then(() => {
-            const { firstname, lastname, email } = body;
+      await tnx('users').insert(obj)
+      const { firstname, lastname } = body;
 
-            console.log(expireDate);
-            const token = genToken(
-              { id, firstname, lastname, email },
-              expireDate
-            );
-            setCookie(res, "usertoken", token);
-            trx.commit();
-            return resolve(token);
-          })
-
-          .catch(trx.rollback)
-          .catch((err) => reject(err));
-      });
+      const token = genToken({ id, firstname, lastname, email }, expireDate);
+      setCookie(res, "usertoken", token);
+      await trx.commit();
+      return resolve(token);
     } catch (error) {
       console.log(error);
+      await tnx.rollback()
       return reject(error);
     }
   });
