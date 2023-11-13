@@ -143,7 +143,7 @@ router
 
 // user auth
 router
-  .post("/signup", signUpUserController)
+  .post("/signin", signUpUserController)
   .post("/login", loginUserController)
   .post("/logout", logOutUserController)
   .post("/loginwithsocial", loginWithSocialController)

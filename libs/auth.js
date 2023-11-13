@@ -3,7 +3,7 @@ const jwt = require("jsonwebtoken");
 exports.auth = async (req, res, next) => {
   const method = req.method;
   const notAllowGet = ["/checkout", "/wishlist", "/billingaddress", "/community/user"];
-  const noAuth = ["/login", "/signup", "/loginwithsocial"];
+  const noAuth = ["/login", "/signin", "/loginwithsocial"];
 
   if(req.url.includes('/productimages')) return next();
   if(req.url.includes('/category')) return next();  

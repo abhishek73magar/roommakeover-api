@@ -17,7 +17,6 @@ exports.signUpUserModel = (body, res) => {
       const email = body.email;
       const user = await knex("users").where("email", email);
       if (user.length !== 0) return reject("Email already exist");
-
       delete body.cpassword;
       const salt = bcrypt.genSaltSync(10);
       body.password = bcrypt.hashSync(body.password, salt);
@@ -28,7 +27,7 @@ exports.signUpUserModel = (body, res) => {
 
       const token = genToken({ id, firstname, lastname, email }, expireDate);
       setCookie(res, "usertoken", token);
-      await trx.commit();
+      await tnx.commit();
       return resolve(token);
     } catch (error) {
       console.log(error);
