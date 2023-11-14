@@ -10,7 +10,7 @@ const {
 const { fileUpload, imageFilter } = require("../libs/fileUpload");
 
 exports.uploadCategoryImage = multer({
-  storage: fileUpload("public/categorysbg"),
+  storage: fileUpload("public/category"),
   fileFilter: imageFilter,
 }).single("imagesrc");
 
