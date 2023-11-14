@@ -12,7 +12,7 @@ exports.addCategoryModel = (body, file) => {
       await knex("categorys").insert(body);
       return resolve("New Category added");
     } catch (error) {
-      if (file) { removeFile(`categorybg/${file.filename}`) }
+      if (file) { removeFile(`category/${file.filename}`) }
       console.log(error);
       return reject(error);
     }
@@ -34,7 +34,7 @@ exports.updateCategoryModel = (body, file, id) => {
     } catch (error) {
       console.log(error);
       if (file) {
-        const path = `categorybg/${file.filename}`;
+        const path = `category/${file.filename}`;
         removeFile(path);
       }
       return reject(error);
