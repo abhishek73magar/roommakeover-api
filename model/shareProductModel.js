@@ -105,9 +105,22 @@ exports.getShareProductModel = () => {
 exports.getShareProductByTitleModel = (title) => {
   return new Promise(async(resolve, reject) => {
     try {
-      tittle = title.replace(/-/g, ' ')
+      title = title.replace(/-/g, ' ').toLowerCase();
+      const query = `SELECT * FROM share_products WHERE LOWER(title)=?`
+      const { rows } = await knex.raw(query, [title])
+      if(rows.length === 0) return reject('product not found')
+      const product = rows[0]
+      const images = await knex('share_product_images').where("share_product_id", product.id)
+      if(images.length === 0) { product.images = null }
+      else { product.images = images }
       
+      const [user] = await knex('users').where('id', product.user_id).select("id", "email", "firstname", "lastname", "phonenumber")
+      if(user) { product.user = user }
+      else { product.user = null }
+
+      return resolve(product)
     } catch (error) {
+      console.log(error)
       return reject(error)
     }
   })
@@ -115,11 +128,6 @@ exports.getShareProductByTitleModel = (title) => {
 
 exports.getShareProductByIdModel = (id, user) => {
   return knex('share_products').where('id', id).andWhere('user_id', user.id)
-}
-
-exports.getShareProductByTitleModel = (title) => {
-  title = title.replace(/-/g, ' ')
-  return knex('share_products').whereILike('title', `%${title}%`)
 }
 
 exports.getShareProductImagesModel = (pid) => {

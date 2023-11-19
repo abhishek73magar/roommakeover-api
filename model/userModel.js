@@ -7,7 +7,7 @@ const { setCookie } = require("../libs/setCookie");
 const jwt = require("jsonwebtoken");
 const moment = require("moment");
 
-const expireDate = moment().add(1, "day").unix();
+const expireDate = moment().add(7, "day").unix();
 
 exports.signUpUserModel = (body, res) => {
   return new Promise(async (resolve, reject) => {
@@ -71,8 +71,8 @@ exports.loginWithSocialUserModel = (body, res) => {
       const salt = bcrypt.genSaltSync(10);
       const password = genPwd.generate({ strict: true });
       body.password = bcrypt.hashSync(password, salt);
-
-      await knex("users").insert(body);
+      console.log(body)
+      await knex("users").insert({...body, id});
       const { firstname, lastname, email } = body;
 
       const token = genToken({ id, firstname, lastname, email }, expireDate);

@@ -85,7 +85,7 @@ const {
   updateReviewController,
   addReviewConttroller,
 } = require("../controller/reviewController");
-const { uploadShareProduct, addShareProductController, getShareProductByIdController, updateShareProductController, deleteShareProductController, getShareProductForUserController, getShareProductController, getShareProductImagesController, deleteShareProductImageByIdController } = require("../controller/shareProductController");
+const { uploadShareProduct, addShareProductController, getShareProductByIdController, updateShareProductController, deleteShareProductController, getShareProductForUserController, getShareProductController, getShareProductImagesController, deleteShareProductImageByIdController, getShareProductByTitleController } = require("../controller/shareProductController");
 const {
   uploadSliderImage,
   addSliderImageController,
@@ -256,7 +256,7 @@ router
   .get('/share-product/user', getShareProductForUserController)
   .get("/share-product/user/:id", getShareProductByIdController)
   .get('/share-product/image/:pid', getShareProductImagesController)
-  .get('/share-product/:title')
+  .get('/share-product/:title', getShareProductByTitleController)
   .get("/share-product", getShareProductController)
   .post("/share-product", uploadShareProduct, addShareProductController)
   .patch("/share-product/:id", uploadShareProduct, updateShareProductController)

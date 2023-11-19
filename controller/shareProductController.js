@@ -39,7 +39,7 @@ exports.getShareProductByIdController = (req, res) => {
 
 exports.getShareProductByTitleController = (req, res) => {
   getShareProductByTitleModel(req.params.title)
-    .then(data => res.status(200).json(data[0]))
+    .then(data => res.status(200).json(data))
     .catch(err => res.status(400).send(err))
 }
 
