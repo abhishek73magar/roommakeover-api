@@ -9,6 +9,7 @@ exports.addOrderModel = (body, user) => {
         val.collection_id = collection_id;
         val.id = uid(10);
         val.user_id = user.id;
+        val.status = 'processing'
         return val;
       });
       // console.log(obj);
