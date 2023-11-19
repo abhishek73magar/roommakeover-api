@@ -61,8 +61,8 @@ exports.getHobbieByNameModel = (name) => {
 exports.getHobbieProductByTitleModel = (title) => {
   return new Promise(async(resolve, reject) => {
     try {
-      const [response] = await knex("hobbie_products").where('title', title.replace(/-/g, ' '))
-      if(!response) return reject("Hobbie not found !")
+      const { rows: response } = await knex.raw(`SELECT * FROM hobbie_products WHERE LOWER(title)=?`, [title.replace(/-/g, ' ').toLowerCase()])
+      if(response.legth === 0) return reject("Hobbie not found !")
 
       const query = `
         SELECT a.*, b.price, b.pid, c.url, c.originalname FROM hobbie_product_list AS a
@@ -71,7 +71,7 @@ exports.getHobbieProductByTitleModel = (title) => {
         WHERE a.hobbie_product_id=?
       `
 
-      const { rows } = await knex.raw(query, [response.id])
+      const { rows } = await knex.raw(query, [response[0].id])
 
       const products = rows.reduce((prev, item) => {
         const check = prev.some((i) => i.product_id === item.product_id);
@@ -79,7 +79,7 @@ exports.getHobbieProductByTitleModel = (title) => {
         return prev;
       }, [])  
 
-      return resolve({ hobbie: response, products })
+      return resolve({ hobbie: response[0], products })
 
     } catch (error) {
       console.log(error)
