@@ -82,7 +82,24 @@ exports.getShareProductForUserModel = (user) => {
 
 // 0 draft, 1 share, 2 onsale
 exports.getShareProductModel = () => {
-  return knex('share_products').where('status', '1').orWhere('status', '2')
+  return new Promise(async(resolve, reject) => {
+    try {
+      const products = await knex('share_products').where('status', '1').orWhere('status', '2')
+      
+      for(let i = 0; i < products.length; i++){
+        const product = products[i]
+        const images = await knex("share_product_images").where("share_product_id", product.id)
+        if(images.length === 0) { product.image = null }
+        else { product.image = images[0] }
+      }
+
+      return resolve(products)
+    } catch (error) {
+      console.log(error)
+      return reject(error)
+    }
+    
+  })
 }
 
 exports.getShareProductByIdModel = (id, user) => {

@@ -6,7 +6,7 @@ exports.addCategoryForAdminModel = (body, file) => {
     try {
       body.imagesrc = "";
 
-      if (file) { body.imagesrc = `categorysbg/${file.filename}` }
+      if (file) { body.imagesrc = `category/${file.filename}` }
       if(body.category_id === '') body.category_id = null;
 
       const response = await knex("categorys").insert(body).returning("*");
@@ -25,7 +25,7 @@ exports.updateCategoryForAdminModel = (body, file, id) => {
       
       if(body.category_id === '' || body.category_id === 'null') body.category_id = null;
       if (file) {
-        body.imagesrc = `categorysbg/${file.filename}`;
+        body.imagesrc = `category/${file.filename}`;
         const [category] = await knex("categorys").where("id", id);
         removeFile(category.imagesrc);
       }
