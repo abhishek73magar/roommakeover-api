@@ -47,9 +47,9 @@ exports.getHobbieByNameModel = (name) => {
     try {
       const query = `
           SELECT b.* FROM hobbies as a
-          INNER JOIN hobbie_products as b ON a.id=b.hobbie_id WHERE LOWER(a.name) LIKE LOWER('%${name}%')
+          INNER JOIN hobbie_products as b ON a.id=b.hobbie_id WHERE LOWER(a.name)=?
         `      
-      const { rows } = await knex.raw(query);
+      const { rows } = await knex.raw(query, [name.toLowerCase()]);
       return resolve(rows)
     } catch (error) {
       console.log(error)

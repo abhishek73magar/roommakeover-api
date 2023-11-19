@@ -225,8 +225,8 @@ router
   .post("/hobbies", uploadHobbieImages, addHobbieController)
   .patch("/hobbies/:id", uploadHobbieImages, updateHobbieController)
   .get("/hobbie", getHobbieController)
-  .get("/hobbie/:name", getHobbieByNameController)
   .get('/hobbie/product/:title', getHobbieProductByTitleController)
+  .get("/hobbie/:name", getHobbieByNameController)
   .delete("/hobbies/:id", deleteHobbieController);
 
 // banners
