@@ -18,7 +18,7 @@ exports.addProductForAdminModel = (body, files) => {
         await tnx("product_images").insert(fileList)
       }
       await tnx.commit();
-
+      return resolve('product added')
     } catch (error) {
       console.log(error)
       await tnx.rollback();
@@ -29,8 +29,6 @@ exports.addProductForAdminModel = (body, files) => {
         });
       }
       return reject(error)
-    }finally{
-      return resolve("product added")
     }
   })
 }
@@ -84,8 +82,11 @@ exports.getProductForAdminModel = (params) => {
       for(let i = 0; i < products.length; i++){
         const product = products[i]
         const [image] = await knex('product_images').where('product_id', product.pid)
-        product.url = image.url;
-        product.originalname = image.originalname;
+        if(image){
+          product.url = image.url;
+          product.originalname = image.originalname;
+        }
+        
       }
 
       if(!params.hasOwnProperty('total')) { return resolve(products) }

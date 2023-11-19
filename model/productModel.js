@@ -281,12 +281,12 @@ exports.topSellingProductModel = (total = 7) => {
         .select("id", "pid", "title", "price", "on_sale", "category_id");
       for (let i = 0; i < products.length; i++) {
         const product = products[i];
-        const [image] = await knex("product_images").where(
-          "product_id",
-          product.pid
-        );
-        product.url = image.url;
-        product.alt = image.originalname;
+        const [image] = await knex("product_images").where("product_id", product.pid);
+        if(image){
+          product.url = image.url;
+          product.alt = image.originalname;
+        }
+       
       }
 
       return resolve(products);
@@ -309,9 +309,11 @@ exports.getOnSellProductModel = (role) => {
           "product_id",
           product.pid
         );
-        product.url = image.url;
-        product.alt = image.originalname;
-
+        if(image) {
+          product.url = image.url;
+          product.alt = image.originalname;
+        }
+         
         product.rating = await countRating(product.pid);
       }
 

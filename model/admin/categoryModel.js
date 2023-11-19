@@ -8,6 +8,12 @@ exports.addCategoryForAdminModel = (body, file) => {
 
       if (file) { body.imagesrc = `category/${file.filename}` }
       if(body.category_id === '') body.category_id = null;
+       
+      const { rows } = await knex.raw(`SELECT COUNT(*) FROM categorys WHERE LOWER(name)=?`, body.name.toLowerCase())
+      if(rows[0].count > 0) {
+        if(file) removeFile(`category/`+ file.filename)
+        return reject("Category already exist !")
+      }
 
       const response = await knex("categorys").insert(body).returning("*");
       return resolve(response);
