@@ -78,13 +78,12 @@ exports.getProductModel = (params, role) => {
       products = await products;
       for (let i = 0; i < products.length; i++) {
         const product = products[i];
-        let [image] = await knex("product_images").where(
-          "product_id",
-          product.pid
-        );
-
-        product.url = image.url;
-        product.alt = image.originalname;
+        let [image] = await knex("product_images").where("product_id", product.pid);
+        if(image){
+          product.url = image.url;
+          product.alt = image.originalname;
+        }
+      
       }
       result["newData"] = products;
       return resolve(result);
