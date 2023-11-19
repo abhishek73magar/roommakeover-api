@@ -256,6 +256,7 @@ router
   .get('/share-product/user', getShareProductForUserController)
   .get("/share-product/user/:id", getShareProductByIdController)
   .get('/share-product/image/:pid', getShareProductImagesController)
+  .get('/share-product/:title')
   .get("/share-product", getShareProductController)
   .post("/share-product", uploadShareProduct, addShareProductController)
   .patch("/share-product/:id", uploadShareProduct, updateShareProductController)

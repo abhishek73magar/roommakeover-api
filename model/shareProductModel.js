@@ -102,6 +102,17 @@ exports.getShareProductModel = () => {
   })
 }
 
+exports.getShareProductByTitleModel = (title) => {
+  return new Promise(async(resolve, reject) => {
+    try {
+      tittle = title.replace(/-/g, ' ')
+      
+    } catch (error) {
+      return reject(error)
+    }
+  })
+}
+
 exports.getShareProductByIdModel = (id, user) => {
   return knex('share_products').where('id', id).andWhere('user_id', user.id)
 }

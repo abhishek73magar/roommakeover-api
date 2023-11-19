@@ -5,7 +5,7 @@ const { removeFile } = require("../../libs/removeFile");
 exports.addProductForAdminModel = (body, files) => {
   return new Promise (async(resolve, reject) => {
     const pid = uid(10);
-    const tnx = knex.transaction();
+    const tnx = await knex.transaction();
     try {
       await tnx('products').insert({pid, ...body})
       if (files && Array.isArray(files) && files.length !== 0) {
