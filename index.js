@@ -26,6 +26,7 @@ app.use(
       "https://admin.theminiland.com",
       "https://roommakeover.com.np",
       "https://admin.roommakeover.com.np",
+      "https://alpha.roommakeover.com.np",
       "http://78.46.201.98:9002",
       "http://78.46.201.98:9000"
     ],
