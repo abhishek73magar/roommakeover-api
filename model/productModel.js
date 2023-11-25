@@ -51,31 +51,23 @@ exports.addProductModel = (body, files) => {
   });
 };
 
-exports.getProductModel = (params, role) => {
+exports.getProductModel = (query) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const result = { newData: [], paginationNum: 1 };
-      let products;
-      if (role === "client") {
-        products = knex("products").where("status", "published");
-      } else {
-        products = knex("products");
-      }
+      const result = { data: [], total_page: 1 };
+      let products = knex('products').where('status', 'published')
 
-      if (params.hasOwnProperty("noofproduct")) {
-        // console.log(params);
-        let noofproduct = params.noofproduct;
+      if (query.hasOwnProperty("no_of_product")) {
+        let no_of_product = query.no_of_product || 1
         let offset = 0;
-        if (params.pagenumber) {
-          offset = params.pagenumber * noofproduct - noofproduct;
-        }
-        const allData = await products;
-        result["paginationNum"] = Math.ceil(allData.length / noofproduct);
+        if (query.pagenumber) { offset = query.pagenumber * no_of_product - no_of_product }
+        const [allProduct] = await knex('products').where('status', 'published').count();
+        result["total_page"] = Math.ceil(allProduct.count / no_of_product)
 
-        products = products.limit(noofproduct).offset(offset);
+        products = products.limit(no_of_product).offset(offset)
       }
 
-      products = await products;
+      products = await products;      
       for (let i = 0; i < products.length; i++) {
         const product = products[i];
         let [image] = await knex("product_images").where("product_id", product.pid);
@@ -83,15 +75,38 @@ exports.getProductModel = (params, role) => {
           product.url = image.url;
           product.alt = image.originalname;
         }
-      
       }
-      result["newData"] = products;
+      result["data"] = products;
       return resolve(result);
     } catch (error) {
+      console.log(error)
       return reject(error);
     }
   });
 };
+
+exports.getProductOtherInfoModel = (query) => {
+  return new Promise(async(resolve, reject) => {
+    // status = [total page number, title]
+    try {
+      if(query.status === 'count' && query.hasOwnProperty('no_of_product')) {
+         const [products] = await knex('products').where('status', 'published').count()
+         const total_page = Math.ceil(products.count / query.no_of_product)
+         return resolve({ total_page })        
+      }
+
+      if(query.status === 'title'){
+        const products = await knex('products').where('status', 'published').select("title")
+        return resolve(products)
+      }
+
+      return resolve(null)
+    } catch (error) {
+      console.log(error)
+      return reject(error)
+    }
+  })
+}
 
 exports.getProductByTablenameModel = (params, role) => {
   return new Promise(async (resolve, reject) => {
@@ -123,6 +138,29 @@ exports.getProductByTablenameModel = (params, role) => {
     }
   });
 };
+
+exports.getproductByTitleModel = (title) => {
+  return new Promise(async(resolve, reject) => {
+    if(!title || title === '') return reject('Params not found !')
+    try {
+      title = title.replace(/-/g, ' ').toLowerCase();
+      const query = `SELECT * FROM products WHERE LOWER(title)=?`
+      const { rows: [product] } = await knex.raw(query, [title]) 
+      if(!product) return reject('Unknow Product')
+
+      const images = await knex('product_images').where({ product_id: product.pid })
+      if(images.length !== 0) {
+          product.url = images[0].url
+          product.alt = images[0].originalname
+          product.images = images
+      }
+
+      return resolve(product)
+    } catch (error) {
+      return reject(error)
+    }
+  })
+}
 
 exports.getProductByPIDModel = (pid) => {
   return new Promise(async(resolve, reject) => {
@@ -226,10 +264,10 @@ exports.totalProductsModel = () => {
 exports.getProductByCategoryNameModel = (name) => {
   return new Promise(async(resolve, reject) => {
     try {
-      const cateogryName = name.replace(/-/g, ' ');
-      const products = await knex('categorys as a').join("products as b", "a.id", "=", "b.category_id")
-      .whereILike('a.name', `%${cateogryName}%`)
-      
+      name = name.replace(/-/g, ' ').toLowerCase();
+      let query = `SELECT b.*, a.name as category_name FROM categorys as a INNER JOIN products as b ON a.id=b.category_id WHERE LOWER(a.name)=?`
+      const { rows: products } = await knex.raw(query, [name])
+
       for (let i = 0; i < products.length; i++) {
         const product = products[i];
         let images = await knex("product_images").where("product_id", product.pid);

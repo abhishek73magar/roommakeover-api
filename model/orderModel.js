@@ -46,41 +46,17 @@ exports.updateOrderModel = (body, id) => {
   });
 };
 
-exports.getOrdersModel = (user_id, role) => {
+exports.getOrdersModel = (user) => {
   return new Promise(async (resolve, reject) => {
     try {
-      let orders = knex("orders as a").leftJoin(
-        "billing_address as b",
-        "a.address_id",
-        "b.id"
-      );
-      if (role === "client") {
-        orders = orders.where("a.user_id", user_id);
-      }
+      let orders = await knex("orders").where("user_id", user.id).orderBy("date", "DESC");
 
-      orders = await orders
-        .select(
-          "a.*",
-          "b.fullname",
-          "b.region",
-          "b.phonenumber",
-          "b.city",
-          "b.area",
-          "b.colony",
-          "b.address",
-          "b.deliveryat"
-        )
-        .orderBy("date", "DESC");
       for (let i = 0; i < orders.length; i++) {
         const order = orders[i];
-        const [image] = await knex("product_images").where(
-          "product_id",
-          order.product_id
-        );
+        const [image] = await knex("product_images").where("product_id",order.product_id);
         order.url = image.url;
         order.alt = image.originalname;
       }
-
       return resolve(orders);
     } catch (error) {
       console.log(error);

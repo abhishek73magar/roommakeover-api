@@ -18,7 +18,7 @@ exports.updateOrderController = (req, res) => {
 };
 
 exports.getOrdersController = (req, res) => {
-  getOrdersModel(req.user__id, req.role)
+  getOrdersModel(req.user, req.role)
     .then((data) => res.status(200).json(data))
     .catch((err) => res.status(400).send(err));
 };
