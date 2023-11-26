@@ -291,17 +291,14 @@ exports.topSellingProductModel = (total = 7) => {
   return new Promise(async (resolve, reject) => {
     try {
       const orderList = await knex("orders")
-        .where("status", "completed")
-        .orWhere("status", "processing")
-        .orWhere("status", "shipping");
+        .where("status", "4")
+        .orWhere("status", "1")
+        .orWhere("status", "2");
 
       const uniqueOrder = orderList.reduce((prev, curr) => {
         const pid = curr.product_id;
-        if (prev.hasOwnProperty(pid)) {
-          prev[pid] += parseInt(curr.qty);
-        } else {
-          prev[pid] = parseInt(curr.qty);
-        }
+        if (prev.hasOwnProperty(pid)) { prev[pid] += parseInt(curr.qty) } 
+        else { prev[pid] = parseInt(curr.qty) }
         return prev;
       }, {});
 
@@ -329,24 +326,21 @@ exports.topSellingProductModel = (total = 7) => {
 
       return resolve(products);
     } catch (error) {
+      console.log(error)
       return reject(error);
     }
   });
 };
 
-exports.getOnSellProductModel = (role) => {
+exports.getOnSellProductModel = () => {
   return new Promise(async (resolve, reject) => {
     try {
       const products = await knex("products")
         .where("status", "published")
         .andWhere("on_sale", "1");
-
       for (let i = 0; i < products.length; i++) {
         const product = products[i];
-        const [image] = await knex("product_images").where(
-          "product_id",
-          product.pid
-        );
+        const [image] = await knex("product_images").where("product_id", product.pidpublished);
         if(image) {
           product.url = image.url;
           product.alt = image.originalname;
