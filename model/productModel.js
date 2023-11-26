@@ -144,6 +144,7 @@ exports.getproductByTitleModel = (title) => {
     if(!title || title === '') return reject('Params not found !')
     try {
       title = title.replace(/-/g, ' ').toLowerCase();
+
       const query = `SELECT * FROM products WHERE LOWER(title)=?`
       const { rows: [product] } = await knex.raw(query, [title]) 
       if(!product) return reject('Unknow Product')
@@ -386,7 +387,6 @@ exports.getSearchProductModel = (title, role) => {
 
       return resolve(products);
     } catch (error) {
-      // console.log(error);
       return reject(error);
     }
   });
