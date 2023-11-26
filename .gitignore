@@ -2,3 +2,6 @@
 /.env
 /public/videos
 /public
+
+yarn.lock
+package-lock.json
