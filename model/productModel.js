@@ -335,12 +335,13 @@ exports.topSellingProductModel = (total = 7) => {
 exports.getOnSellProductModel = () => {
   return new Promise(async (resolve, reject) => {
     try {
+      console.log('check')
       const products = await knex("products")
         .where("status", "published")
         .andWhere("on_sale", "1");
       for (let i = 0; i < products.length; i++) {
         const product = products[i];
-        const [image] = await knex("product_images").where("product_id", product.pidpublished);
+        const [image] = await knex("product_images").where("product_id", product.pid);
         if(image) {
           product.url = image.url;
           product.alt = image.originalname;
