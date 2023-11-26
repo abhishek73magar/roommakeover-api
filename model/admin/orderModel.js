@@ -3,7 +3,7 @@ const knex = require("../../db")
 exports.getOrderForAdminModel = () => {
   return new Promise(async(resolve, reject) => {
     try {
-      const orders = await knex('orders').orderBy("date", 'desc')
+      const orders = await knex('orders').orderBy("date", 'DESC')
       return resolve(orders)
     } catch (error) {
       console.log(error)
@@ -21,9 +21,9 @@ exports.getOrderByIdForAdminModel = (collection_id) => {
         WHERE a.collection_id=?
         `
       const { rows } = await knex.raw(query, [collection_id])
-      const [billing] = await knex('billing_address').where('user_id', rows[0].user_id).andWhere('status', 'active')
-      rows[0].billing = billing;
-      return resolve(rows[0])
+      if(rows.length === 0) return reject("Order not found !")
+      const [billing] = await knex('billing_address').where('user_id', rows[0].user_id).andWhere("id", rows[0].address_id)
+      return resolve({ orders: rows, billing })
     } catch (error) {
       console.log(error)
       return reject(error)
@@ -31,11 +31,20 @@ exports.getOrderByIdForAdminModel = (collection_id) => {
   })
 }
 
-exports.updateOrderForAdminModel = (body, collection_id) => {
+exports.updateOrderForAdminModel = (body, query) => {
   return new Promise (async(resolve, reject) => {
     try {
-      await knex('orders').where('collection_id', collection_id).update(body)
+      if(query.hasOwnProperty('collection_id')){
+        await knex('orders').where('collection_id', query.collection_id).update({ ...body, status_datetime: new Date().toISOString() })
+      } else if(query.hasOwnProperty("order_id")) { 
+        await knex('orders').where('id', query.order_id).update({ ...body, status_datetime: new Date().toISOString() })
+      } else {
+        return reject("Order not found !")
+      }
       return resolve('order updated')
+
+
+      
     } catch (error) {
       return reject(error)
     }

@@ -24,7 +24,7 @@ router
 router
   .get("/order", getOrderForAdminController)
   .get('/order/:collection_id', getOrderByIdForAdminController)
-  .patch("/order/:collection_id", updateOrderForAdminController)
+  .patch("/order", updateOrderForAdminController)
   .delete('/order/:collection_id')
 
 

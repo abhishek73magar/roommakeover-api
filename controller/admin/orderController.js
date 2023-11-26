@@ -13,7 +13,7 @@ exports.getOrderByIdForAdminController = (req, res) => {
 }
 
 exports.updateOrderForAdminController = (req, res) => {
-  updateOrderForAdminModel(req.body, req.params.collection_id)
+  updateOrderForAdminModel(req.body, req.query)
     .then(msg => res.status(200).send(msg))
     .catch(err => res.status(400).send(err))
 }

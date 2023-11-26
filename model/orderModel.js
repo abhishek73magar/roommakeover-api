@@ -3,33 +3,21 @@ const knex = require("../db");
 
 exports.addOrderModel = (body, user) => {
   return new Promise(async (resolve, reject) => {
+    const tnx = await knex.transaction();
     try {
       const collection_id = uid(10);
       const obj = body.map((val) => {
-        val.collection_id = collection_id;
-        val.id = uid(10);
-        val.user_id = user.id;
-        val.status = 'processing'
-        return val;
+        return {...val, collection_id, id: uid(10), user_id: user.id };
       });
       // console.log(obj);
-      return await knex.transaction((tnx) => {
-        return knex("orders")
-          .transacting(tnx)
-          .insert(obj)
-          .then(() => {
-            return knex("checkout")
-              .where("user_id", user.id)
-              .delete()
-              .then(tnx.commit)
-              .then(() => resolve("Order send"))
-              .catch(tnx.rollback)
-              .catch((err) => reject(err));
-          })
-          .catch((err) => reject(err));
-      });
+      await tnx('orders').insert(obj)
+      await tnx('checkout').where('user_id', user.id).delete();
+
+      await tnx.commit();
+      return resolve('Order send')
     } catch (error) {
       console.log(error);
+      await tnx.rollback();
       return reject(error);
     }
   });
