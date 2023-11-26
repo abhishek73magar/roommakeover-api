@@ -5,7 +5,7 @@ exports.addDIYProductModel = (body, file) => {
   return new Promise(async(resolve, reject) => {
     const tnx = await knex.transaction();
     try {
-      if(file) { body.thumbnail = `DIY-products/` + file.originalname }
+      if(file) { body.thumbnail = `diy-products/` + file.filename }
       let products = JSON.parse(body.products);
       delete body.products;
 
@@ -31,23 +31,23 @@ exports.updateDIYProductModel = (body, file, id) => {
   return new Promise(async(resolve, reject) => {
     const tnx = await knex.transaction();
     try {
-      if(file) { body.thumbnail = `DIY-products/` + file.originalname }      
+      if(file) { body.thumbnail = `diy-products/` + file.filename }      
       const productList = await knex('diy_product_list').where('diy_id', id)
       let products = JSON.parse(body.products);
 
       const removeProduct = productList.reduce((prev, curr) => {
-        const check = products.some(i => i.diy_id === curr.id);
+        const check = products.some(item => item === curr.product_id);
         if(!check) { prev.push(curr.id) }
         return prev;
       }, [])
       
       const newProduct = products.reduce((prev, product_id) => {
-        const check = productList.some(item => item.id === product_id)
+        const check = productList.some(item => item.product_id === product_id)
         if(!check) { prev.push({ product_id, diy_id: id }) }
         return prev;
       }, [])
 
-      if(Array.isArray(newProduct) && newProduct.length !== 0) await tnx('diy_product_list').where('id', removeProduct)
+      if(Array.isArray(newProduct) && newProduct.length !== 0) await tnx('diy_product_list').whereIn('id', removeProduct).delete();
       if(Array.isArray(newProduct) && newProduct.length !== 0) await tnx('diy_product_list').insert(newProduct)
       
       delete body.products;
@@ -56,7 +56,8 @@ exports.updateDIYProductModel = (body, file, id) => {
       await tnx.commit();
       return resolve("DIY Product updated")
     } catch (error) {
-      if(file){ removeFile(`DIY-products/${file.filename}`)}
+      console.log(error)
+      if(file){ removeFile(`diy-products/${file.filename}`)}
       return reject(error)
     }
   })
@@ -65,10 +66,7 @@ exports.updateDIYProductModel = (body, file, id) => {
 exports.getDIYProductModel = () => {
   return new Promise(async(resolve, reject) => {
     try {
-      let query = `
-          SELECT a.*, b.name as category FROM diy_products as a
-          INNER JOIN categorys as b ON a.category_id=b.id
-        `
+      let query = ` SELECT * FROM diy_products `
       const { rows } = await knex.raw(query);
       return resolve(rows)
     } catch (error) {
@@ -83,9 +81,9 @@ exports.getDIYProductByIdModel = (id) => {
     try { 
       const [DIYProduct] = await knex('diy_products').where('id', id)
       const query = `
-          SELECT a.*, b.url,  from diy_product_list AS a
+          SELECT a.*, b.url from diy_product_list AS a
           INNER JOIN product_images AS b ON a.product_id=b.product_id 
-          WHERE diy_product_id=?
+          WHERE a.diy_id=?
         `
       const { rows } = await knex.raw(query, [id])
       const productList = rows.reduce((prev, curr) => {

@@ -4,7 +4,22 @@ exports.getOrderForAdminModel = () => {
   return new Promise(async(resolve, reject) => {
     try {
       const orders = await knex('orders').orderBy("date", 'DESC')
-      return resolve(orders)
+
+      const newOrderList = orders.reduce((prev, curr) => {
+        const order = prev.find(item => item.collection_id === curr.collection_id)
+        if(order) { order.total_product += 1; order.total_price += curr.qty * curr.price }
+        else { prev.push({ ...curr, total_product: 1, total_price: curr.qty * curr.price }) }
+        return prev;
+      }, [])
+
+      const orderLength = newOrderList.length;
+      for(let i = 0; i < orderLength; i++){
+        const order = newOrderList[i]
+        const [billing] = await knex('billing_address').where('id', order.address_id).returning("fullname")
+        order.fullname = billing.fullname
+      }
+
+      return resolve(newOrderList)
     } catch (error) {
       console.log(error)
       return reject(error)

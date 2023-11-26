@@ -335,7 +335,6 @@ exports.topSellingProductModel = (total = 7) => {
 exports.getOnSellProductModel = () => {
   return new Promise(async (resolve, reject) => {
     try {
-      console.log('check')
       const products = await knex("products")
         .where("status", "published")
         .andWhere("on_sale", "1");
