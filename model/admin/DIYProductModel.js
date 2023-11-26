@@ -101,5 +101,22 @@ exports.getDIYProductByIdModel = (id) => {
 }
 
 exports.deleteDIYProductModel = (id) => {
-  return knex('diy_product').where('id', id).delete()
+  return new Promise(async(resolve, reject) => {
+    const tnx = await knex.transaction();
+    try {
+      const [diy] = await knex('diy_products').where('id', id)
+      if(!diy) throw "diy product not found !"
+
+      await tnx('diy_products').where('id', id).delete()
+      removeFile(diy.thumbnail)
+
+      await tnx.commit();
+      return resolve('diy product removed')
+      
+    } catch (error) {
+      await tnx.rollback();
+      console.log(error)
+      return reject(error)
+    }
+  })
 }

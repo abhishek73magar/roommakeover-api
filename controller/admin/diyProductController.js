@@ -32,7 +32,7 @@ exports.getDIYProductByIdController = (req, res) => {
 }
 
 exports.deleteDIYProductController = (req, res) => {
-    deleteDIYProductModel()
+    deleteDIYProductModel(req.params.id)
       .then(msg => res.status(200).send(msg))
       .catch(err => res.status(400).send(err))
 }
