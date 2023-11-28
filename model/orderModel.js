@@ -45,7 +45,14 @@ exports.getOrdersModel = (user) => {
         order.url = image.url;
         order.alt = image.originalname;
       }
-      return resolve(orders);
+
+      const newOrders = orders.reduce((prev, curr) => {
+        const orderCollection = prev.find((item) => item.collection_id === curr.collection_id);
+        if(orderCollection) { orderCollection.data.push(curr) }
+        else { prev.push({ collection_id: curr.collection_id, datetime: curr.date, data: [ curr ]}) }
+        return prev;
+      }, [])
+      return resolve(newOrders);
     } catch (error) {
       console.log(error);
       return reject(error);
@@ -53,20 +60,27 @@ exports.getOrdersModel = (user) => {
   });
 };
 
-exports.getOrderByIdModel = (name, value) => {
+exports.getOrderByIdModel = (collection_id, user) => {
   return new Promise(async (resolve, reject) => {
     try {
-      let data = await knex("orders")
-        .join(
-          "billing_address",
-          "orders.address_id",
-          "=",
-          "billing_address.id"
-        )
-        .where(`orders.${name}`, value);
+      let orders = await knex("orders").where({ user_id: user.id, collection_id }).orderBy("date", "DESC");
 
-      // data = await data;
-      return resolve(data);
+      for (let i = 0; i < orders.length; i++) {
+        const order = orders[i];
+        const [image] = await knex("product_images").where("product_id",order.product_id);
+        order.url = image.url;
+        order.alt = image.originalname;
+      }
+
+      const newOrders = orders.reduce((prev, curr) => {
+        const orderCollection = prev.find((item) => item.collection_id === curr.collection_id);
+        if(orderCollection) { orderCollection.data.push(curr) }
+        else { prev.push({ collection_id: curr.collection_id, datetime: curr.date, data: [ curr ]}) }
+        return prev;
+      }, [])
+      
+      if(newOrders.length === 0) return reject("Order not found !")
+      return resolve(newOrders[0]);
     } catch (error) {
       return reject(error);
     }

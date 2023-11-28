@@ -142,7 +142,7 @@ router
   .patch("/order/:collectionid", updateOrderController)
   .get("/order", getOrdersController)
   .get("/order/history/:total")
-  .get("/order/:name/:value", getOrderByIdController);
+  .get("/order/:collection_id", getOrderByIdController);
 
 // user auth
 router

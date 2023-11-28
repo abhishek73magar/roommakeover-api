@@ -24,7 +24,7 @@ exports.getOrdersController = (req, res) => {
 };
 
 exports.getOrderByIdController = (req, res) => {
-  getOrderByIdModel(req.params.name, req.params.value)
+  getOrderByIdModel(req.params.collection_id, req.user)
     .then((data) => res.status(200).json(data))
     .catch((err) => res.status(400).send(err));
 };
