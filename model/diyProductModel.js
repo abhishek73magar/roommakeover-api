@@ -27,8 +27,6 @@ exports.getDiyProductByTitleModel = async(title) => {
       }
     }
 
-    
-
     return {...diyProduct, products };
   } catch (error) {
     return error;
