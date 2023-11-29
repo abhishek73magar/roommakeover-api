@@ -47,6 +47,7 @@ const {
   getCommunityPostByTableNameController,
   deleteCommunityPostController,
 } = require("../controller/communityPostController");
+const { getDiyProductController, getDiyProductByTitleController, getDiyProductAllTitleController } = require("../controller/diyProductController");
 const {
   uploadHobbieImages,
   addHobbieController,
@@ -231,6 +232,12 @@ router
   .get('/hobbie/product/:title', getHobbieProductByTitleController)
   .get("/hobbie/:name", getHobbieByNameController)
   .delete("/hobbies/:id", deleteHobbieController);
+
+// do-it-yourself (diy products)
+router
+  .get('/diy-product', getDiyProductController)
+  .get('/diy-product/title', getDiyProductAllTitleController)
+  .get('/diy-product/:title', getDiyProductByTitleController)
 
 // banners
 router

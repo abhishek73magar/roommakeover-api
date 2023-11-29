@@ -47,11 +47,12 @@ exports.updateDIYProductModel = (body, file, id) => {
         return prev;
       }, [])
 
-      if(Array.isArray(newProduct) && newProduct.length !== 0) await tnx('diy_product_list').whereIn('id', removeProduct).delete();
+      if(Array.isArray(removeProduct) && removeProduct.length !== 0) await tnx('diy_product_list').whereIn('id', removeProduct).delete();
       if(Array.isArray(newProduct) && newProduct.length !== 0) await tnx('diy_product_list').insert(newProduct)
       
       delete body.products;
-      await tnx('diy_products').update(body)
+      console.log(body, newProduct, removeProduct)
+      await tnx('diy_products').where('id', id).update(body)
 
       await tnx.commit();
       return resolve("DIY Product updated")
@@ -63,17 +64,14 @@ exports.updateDIYProductModel = (body, file, id) => {
   })
 }
 
-exports.getDIYProductModel = () => {
-  return new Promise(async(resolve, reject) => {
-    try {
-      let query = ` SELECT * FROM diy_products `
-      const { rows } = await knex.raw(query);
-      return resolve(rows)
+exports.getDIYProductModel = async() => {
+    try {   
+      const products = await knex("diy_products").orderBy("id", "DESC")
+      return products;
     } catch (error) {
       console.log(error)
-      return reject(error)
+      return error;
     }
-  })
 }
 
 exports.getDIYProductByIdModel = (id) => {
