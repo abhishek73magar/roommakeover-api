@@ -7,6 +7,7 @@ const {
   logOutUserModel,
   loginWithSocialUserModel,
   verifyUserModel,
+  updateUserBioModel,
 } = require("../model/userModel");
 
 exports.signUpUserController = (req, res) => {
@@ -38,6 +39,12 @@ exports.updateUserController = (req, res) => {
     .then((message) => res.status(200).json({ message }))
     .catch((err) => res.status(400).send(err));
 };
+
+exports.updateUserBioController = (req, res) => {
+  updateUserBioModel(req.body, req.user)
+    .then(msg => res.status(200).send(msg))
+    .catch(err => res.status(500).send(err))
+}
 
 exports.getUserController = (req, res) => {
   getUserModel()

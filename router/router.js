@@ -104,6 +104,7 @@ const {
   logOutUserController,
   loginWithSocialController,
   verifyUserController,
+  updateUserBioController,
 } = require("../controller/userController");
 const {
   addWishlistController,
@@ -151,6 +152,7 @@ router
   .post("/login", loginUserController)
   .post("/logout", logOutUserController)
   .post("/loginwithsocial", loginWithSocialController)
+  .patch('/user/bio', updateUserBioController)
   .patch("/user/:id", updateUserController)
   .get("/user", getUserController)
   .get("/verify-user", verifyUserController)

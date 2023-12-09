@@ -16,7 +16,7 @@ exports.signUpUserModel = (body, res) => {
       const id = uid(16);
       const email = body.email;
       const user = await knex("users").where("email", email);
-      if (user.length !== 0) return reject("Email already exist");
+      if (user.length !== 0) return reject("Email already   exist");
       delete body.cpassword;
       const salt = bcrypt.genSaltSync(10);
       body.password = bcrypt.hashSync(body.password, salt);
@@ -107,6 +107,17 @@ exports.updateUserModel = (body, id) => {
     }
   });
 };
+
+exports.updateUserBioModel = async(body, user) => {
+  try {
+    if(!body.hasOwnProperty('bio')) throw "Bio not found!"
+    await knex('users').where('id', user.id).update({ bio: body.bio })  
+    return "update successfully"  
+  } catch (error) {
+    console.log(error)
+    return error
+  }
+}
 
 exports.getUserModel = () => {
   return new Promise(async (resolve, reject) => {
