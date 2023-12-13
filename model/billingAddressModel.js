@@ -14,7 +14,7 @@ exports.updateBillingAddressModel = (body, id, user) => {
       //     .andWhere("status", "active")
       //     .update({ status: "inactive" });
       // }
-
+ 
       await knex("billing_address").where("id", id).andWhere("user_id", user.id).update(body);
       return resovle("Billing address updated");
     } catch (error) {
@@ -43,4 +43,4 @@ exports.deleteBillingAddressModel = (id, user) => {
     .where("id", id)
     .andWhere("user_id", user.id)
     .delete();
-};
+};  

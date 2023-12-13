@@ -1,3 +1,4 @@
+const { addBlogController, updateBlogController, getBlogController, getBlogByIdController, deleteBlogController, uploadBlogThumbnail } = require('../controller/admin/blogController');
 const { uploadCategoryForAdminImage, addCategoryForAdminController, updateCategoryForAdminController, getCategoryForAdminController, getCategoryByIdForAdminController, deleteCategoryForAdminController } = require('../controller/admin/categoryController');
 const { uploadDIYProductThumbnail, addDIYProductController, getDIYProductController, updateDIYProductController, deleteDIYProductController, getDIYProductByIdController } = require('../controller/admin/diyProductController');
 const { uploadHobbieThumbnail, addHobbieForAdminController, updateHobbieForAdminController, getHobbieForAdminController, getHobbieByIdForAdminController, deleteHobbieForAdminController } = require('../controller/admin/hobbieController');
@@ -65,6 +66,14 @@ router
   .get('/diy-product', getDIYProductController)
   .get('/diy-product/:id', getDIYProductByIdController)
   .delete('/diy-product/:id', deleteDIYProductController)
+
+// blogs
+router
+  .post('/blog', uploadBlogThumbnail, addBlogController)
+  .patch('/blog/:id', uploadBlogThumbnail, updateBlogController)
+  .get("/blog", getBlogController)
+  .get('/blog/:id', getBlogByIdController)
+  .delete('/blog/:id', deleteBlogController)
 
 
 module.exports = router;
