@@ -3,6 +3,7 @@ const { uploadCategoryForAdminImage, addCategoryForAdminController, updateCatego
 const { uploadDIYProductThumbnail, addDIYProductController, getDIYProductController, updateDIYProductController, deleteDIYProductController, getDIYProductByIdController } = require('../controller/admin/diyProductController');
 const { uploadHobbieThumbnail, addHobbieForAdminController, updateHobbieForAdminController, getHobbieForAdminController, getHobbieByIdForAdminController, deleteHobbieForAdminController } = require('../controller/admin/hobbieController');
 const { addHobbieProductController, updateHobbieProductController, uploadHobbieProductThumbnail, getHobbieProductController, getHobbieProductByIdController, deleteHobbieProductController } = require('../controller/admin/hobbieProductController');
+const { addMediaController, getMediaController, deleteMediaController, uploadMedia } = require('../controller/admin/mediaController');
 const { getOrderForAdminController, updateOrderForAdminController, getOrderByIdForAdminController } = require('../controller/admin/orderController');
 const { addProductForAdminController, uploadProductImage, updateProductForAdminController, getProductForAdminController, getProductByPIDForAdminController, deleteProductForAdminController, getProductSingleImageConroller } = require('../controller/admin/productController');
 
@@ -74,6 +75,11 @@ router
   .get("/blog", getBlogController)
   .get('/blog/:id', getBlogByIdController)
   .delete('/blog/:id', deleteBlogController)
+
+router
+  .post('/media', uploadMedia, addMediaController)
+  .get('/media', getMediaController)
+  .delete('/media/:id', deleteMediaController)
 
 
 module.exports = router;
