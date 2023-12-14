@@ -13,20 +13,17 @@ exports.addBlogModel = async(body, file) => {
     return error;
   }
 }
-exports.updateBlogModel = async(body, id, user) => {
+exports.updateBlogModel = async(body, file, id) => {
   const tnx = await knex.transaction()
   try {
-    if(file) { body.thumbnail = "blog/" +  file.filename }
-    await knex("blogs").where('id', id).update({ ...body, update_time: new Date().toISOString() })
+    const [blog] = await knex('blogs').where('id', id)
 
-    if(file) {       
-      const [blog] = await tnx('blogs').where('id', id)
-      if(!!blog) { removeFile(blog.thumbnail) }
-    }
-    await tnx.commit()
+    if(file) { body.thumbnail = "blog/" +  file.filename  }
+    await knex("blogs").where('id', id).update({ ...body, update_time: new Date().toISOString() })
+    if(!!blog && file) { removeFile(blog.thumbnail) }
+
     return "Blog update successfully"
   } catch (error) {
-    await tnx.rollback();
     console.log(error)
     if(file) { removeFile(`blog/${file.filename}`)}
 
@@ -45,7 +42,7 @@ exports.getBlogByIdModel = async(id) => {
   } catch (error) {
     console.log(error)
     return error;
-  }
+  } 
 }
 
 exports.deleteBlogModel = async(id) => {
