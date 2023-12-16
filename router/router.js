@@ -14,6 +14,7 @@ const {
   getBillingAddressByIdController,
   deleteBillingAddressController,
 } = require("../controller/billingAddressController");
+const { getBlogController, getBlogByTitleController, getBlogOtherInfoController } = require("../controller/blogController");
 const {
   uploadBrandImage,
   addBrandController,
@@ -274,5 +275,10 @@ router
   .patch("/share-product/:id", uploadShareProduct, updateShareProductController)
   .delete('/share-product/image/:id', deleteShareProductImageByIdController)
   .delete("/share-product/:id", deleteShareProductController)
+
+router
+  .get('/blog', getBlogController)
+  .get('/blog/other-info', getBlogOtherInfoController)
+  .get('/blog/:title', getBlogByTitleController)
 
 module.exports = router;
