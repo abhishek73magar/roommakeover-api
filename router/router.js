@@ -90,12 +90,7 @@ const {
   addReviewConttroller,
 } = require("../controller/reviewController");
 const { uploadShareProduct, addShareProductController, getShareProductByIdController, updateShareProductController, deleteShareProductController, getShareProductForUserController, getShareProductController, getShareProductImagesController, deleteShareProductImageByIdController, getShareProductByTitleController } = require("../controller/shareProductController");
-const {
-  uploadSliderImage,
-  addSliderImageController,
-  getSliderImageController,
-  deleteSliderImageController,
-} = require("../controller/sliderImageController");
+const { getSliderImageController } = require("../controller/sliderImageController");
 const {
   signUpUserController,
   loginUserController,
@@ -223,9 +218,7 @@ router
 
 // slider
 router
-  .post("/slider", uploadSliderImage, addSliderImageController)
   .get("/slider", getSliderImageController)
-  .delete("/slider/:id", deleteSliderImageController);
 
 // hobbies list (design by your hobbies)
 router

@@ -6,6 +6,7 @@ const { addHobbieProductController, updateHobbieProductController, uploadHobbieP
 const { addMediaController, getMediaController, deleteMediaController, uploadMedia } = require('../controller/admin/mediaController');
 const { getOrderForAdminController, updateOrderForAdminController, getOrderByIdForAdminController } = require('../controller/admin/orderController');
 const { addProductForAdminController, uploadProductImage, updateProductForAdminController, getProductForAdminController, getProductByPIDForAdminController, deleteProductForAdminController, getProductSingleImageConroller } = require('../controller/admin/productController');
+const { uploadSliderImage, addSliderImageController, deleteSliderImageController, getSliderImageController } = require('../controller/admin/sliderImageController');
 
 const router = require('express').Router();
 
@@ -68,6 +69,12 @@ router
   .get('/diy-product/:id', getDIYProductByIdController)
   .delete('/diy-product/:id', deleteDIYProductController)
 
+// slider image
+router
+  .post('/slider', uploadSliderImage, addSliderImageController)
+  .get('/slider', getSliderImageController)
+  .delete('/slider/:id', deleteSliderImageController)
+
 // blogs
 router
   .post('/blog', uploadBlogThumbnail, addBlogController)
@@ -76,6 +83,7 @@ router
   .get('/blog/:id', getBlogByIdController)
   .delete('/blog/:id', deleteBlogController)
 
+// all blog media
 router
   .post('/media', uploadMedia, addMediaController)
   .get('/media', getMediaController)
