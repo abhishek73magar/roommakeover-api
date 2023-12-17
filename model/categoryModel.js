@@ -68,7 +68,8 @@ exports.getCategoryByNameModel = (name) => {
 exports.getSubCategoryByName = (name) => {
   return new Promise(async(resolve, reject) => {
     try {
-      const category = await knex('categorys').whereILike('name', `%${name}%`)
+      name = name.toLowerCase().replace(/-/g, ' ')
+      const { rows: category } = await knex.raw(`SELECT * FROM categorys WHERE lower(name)=?`, [name])
       if(category.length !== 0) {
         const subCategorys = await knex('categorys').whereIn('category_id', category.map((i) => i.id))
         return resolve(subCategorys)
@@ -76,6 +77,7 @@ exports.getSubCategoryByName = (name) => {
 
       return resolve([])
     } catch (error) {
+      console.log(error)
       return reject(error)
     }
   })
