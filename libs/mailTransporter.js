@@ -27,7 +27,7 @@ module.exports = async(mailOptions) => {
     const result = await transport.sendMail(mailOptions)
     return result
   } catch (error) {
-    return error
+    return Promise.reject(error)
   }
  
 };

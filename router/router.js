@@ -89,6 +89,7 @@ const {
   updateReviewController,
   addReviewConttroller,
 } = require("../controller/reviewController");
+const { sendMailController } = require("../controller/sendMailController");
 const { uploadShareProduct, addShareProductController, getShareProductByIdController, updateShareProductController, deleteShareProductController, getShareProductForUserController, getShareProductController, getShareProductImagesController, deleteShareProductImageByIdController, getShareProductByTitleController } = require("../controller/shareProductController");
 const { getSliderImageController } = require("../controller/sliderImageController");
 const {
@@ -274,4 +275,7 @@ router
   .get('/blog/other-info', getBlogOtherInfoController)
   .get('/blog/:title', getBlogByTitleController)
 
+
+router
+  .post('/sendmail', sendMailController)
 module.exports = router;
