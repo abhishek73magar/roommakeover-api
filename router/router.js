@@ -48,6 +48,7 @@ const {
   getCommunityPostByTableNameController,
   deleteCommunityPostController,
 } = require("../controller/communityPostController");
+const { addCustomizationController, getCustomizationController, uploadCustomizationImage } = require("../controller/customizationController");
 const { getDiyProductController, getDiyProductByTitleController, getDiyProductAllTitleController } = require("../controller/diyProductController");
 const {
   uploadHobbieImages,
@@ -270,10 +271,16 @@ router
   .delete('/share-product/image/:id', deleteShareProductImageByIdController)
   .delete("/share-product/:id", deleteShareProductController)
 
+// blogs
 router
   .get('/blog', getBlogController)
-  .get('/blog/other-info', getBlogOtherInfoController)
+  .get('/blog/other-info', getBlogOtherInfoController)  
   .get('/blog/:title', getBlogByTitleController)
+
+// customization
+router
+  .post('/customization-product', uploadCustomizationImage, addCustomizationController)
+  .get('/customization-product', getCustomizationController)
 
 
 router

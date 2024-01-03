@@ -1,5 +1,6 @@
 const { addBlogController, updateBlogController, getBlogController, getBlogByIdController, deleteBlogController, uploadBlogThumbnail } = require('../controller/admin/blogController');
 const { uploadCategoryForAdminImage, addCategoryForAdminController, updateCategoryForAdminController, getCategoryForAdminController, getCategoryByIdForAdminController, deleteCategoryForAdminController } = require('../controller/admin/categoryController');
+const { updateCustomizationController, getCustomizationController, getCustomizationByIdController, removeCustomizationController } = require('../controller/admin/customizationController');
 const { uploadDIYProductThumbnail, addDIYProductController, getDIYProductController, updateDIYProductController, deleteDIYProductController, getDIYProductByIdController } = require('../controller/admin/diyProductController');
 const { uploadHobbieThumbnail, addHobbieForAdminController, updateHobbieForAdminController, getHobbieForAdminController, getHobbieByIdForAdminController, deleteHobbieForAdminController } = require('../controller/admin/hobbieController');
 const { addHobbieProductController, updateHobbieProductController, uploadHobbieProductThumbnail, getHobbieProductController, getHobbieProductByIdController, deleteHobbieProductController } = require('../controller/admin/hobbieProductController');
@@ -88,6 +89,13 @@ router
   .post('/media', uploadMedia, addMediaController)
   .get('/media', getMediaController)
   .delete('/media/:id', deleteMediaController)
+
+// customization 
+router
+  .patch('/customization-product/:id', updateCustomizationController)
+  .get('/customization-product', getCustomizationController)
+  .get('/customization-product/:id', getCustomizationByIdController)
+  .delete('/customization-prdoduct/:id', removeCustomizationController)
 
 
 module.exports = router;

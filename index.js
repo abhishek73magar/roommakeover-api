@@ -28,6 +28,8 @@ app.use(
       "https://admin.roommakeover.com.np",
       "https://www.roommakeover.com.np",
       "https://alpha.roommakeover.com.np",
+      "https://dashboard.roommakeover.com.np",
+      "http://dashboard.roommakeover.com.np",
       "http://78.46.201.98:9002",
       "http://78.46.201.98:9000"
     ],
