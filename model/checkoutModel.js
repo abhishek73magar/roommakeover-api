@@ -31,22 +31,31 @@ exports.addMultipleProductAsCheckoutModel = (body, user) => {
     try {
       const checkoutProduct = await knex('checkout').where('user_id', user.id)
       const removeIds = []
+      const updateProduct = []
       const changeAbleProduct = body.reduce((prev, item) => {
         const product = checkoutProduct.find((i) => i.product_id === item.product_id)
         // console.log(product)
         if(product){
-          item.qty = item.qty + +product.qty
-          removeIds.push(product.id) 
+          product.qty = item.qty + +product.qty
+          updateProduct.push(product)
+          // removeIds.push(product.id) 
         } else {
           item.id = uid(10)
           item.user_id = user.id;
+          prev.push(item)
         }
-
-        prev.push(item)
+        // console.log(item)
         return prev;
       }, [])
 
-      if(removeIds.length !== 0) await tnx('checkout').whereIn('id', removeIds).delete();
+      if(removeIds.length > 0) await tnx('checkout').whereIn('id', removeIds).delete();
+      if(updateProduct.length > 0){
+        const updateStatement = updateProduct.map(obj => `WHEN '${obj.id}' THEN ?`).join(' ');
+        const values = updateProduct.map(obj => obj.qty);
+        const rawQuery = `UPDATE checkout SET qty = CASE id ${updateStatement} ELSE qty END`;
+        await tnx.raw(rawQuery, values)
+
+      }
       if(changeAbleProduct.length !== 0) await tnx("checkout").insert(changeAbleProduct);
       await tnx.commit();
       return resolve("Product added for checkout");
