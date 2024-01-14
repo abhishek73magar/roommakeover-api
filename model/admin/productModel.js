@@ -22,22 +22,21 @@ exports.addProductForAdminModel = (body, files) => {
     } catch (error) {
       console.log(error)
       await tnx.rollback();
-      if (files) {
-        files.forEach(({ filename }) => {
-          const path = `product/${filename}`;
-          removeFile(path);
-        });
-      }
+      if (Array.isArray(files)) {files.forEach(({ filename }) => removeFile(`product/${filename}`))}
       return reject(error)
     }
   })
 }
 
-exports.updateProductForAdminModel = (body, files, pid) => {
-  return new Promise(async(resolve, reject) => {
+exports.updateProductForAdminModel = async(body, files, pid) => {
     const tnx = await knex.transaction();
     try {
-      if (files && Array.isArray(files) && files.length !== 0) {
+      Object.keys(body).forEach((keys) => {
+        if(body[keys] === 'null') body[keys] = null
+        if(keys === 'colors') body[keys] = JSON.parse(body[keys])
+      })
+
+      if (Array.isArray(files) && files.length > 0) {
         const fileList = files.map((file) => {
           const name = file.filename;
           const url = "products/" + name;
@@ -50,12 +49,14 @@ exports.updateProductForAdminModel = (body, files, pid) => {
 
       const obj = { ...body, update_date: new Date().toISOString() };
       await tnx("products").where("pid", pid).update(obj);
-      await tnx.commit();
-      return resolve("Product updated")
+      await tnx.commit(); 
+      return "Product updated"
     } catch (error) {
-      return reject(error)
+      console.log(error)
+      await tnx.rollback()
+      if (Array.isArray(files)) {files.forEach(({ filename }) => removeFile(`product/${filename}`))}
+      return Promise.reject(error)
     }
-  })
 }
 
 exports.getProductForAdminModel = (params) => {
