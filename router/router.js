@@ -119,9 +119,6 @@ router.get("/test", (req, res) => res.send("api is running"));
 
 // products
 router
-  .post("/product", uploadProductImage, addProductController)
-  .patch("/product/:pid", uploadProductImage, updateProductController)
-
   .get("/product/other-info", getProductOtherInfoController)
   .get("/product/category/:name", getProductByCategoryNameController)
   .get('/product/:title', getProductByTitleController)

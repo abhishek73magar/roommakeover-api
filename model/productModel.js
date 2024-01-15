@@ -51,33 +51,41 @@ exports.addProductModel = (body, files) => {
   });
 };
 
-exports.getProductModel = (query) => {
+exports.getProductModel = (params) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const result = { data: [], total_page: 1 };
-      let products = knex('products').where('status', 'published')
 
-      if (query.hasOwnProperty("no_of_product")) {
-        let no_of_product = query.no_of_product || 1
-        let offset = 0;
-        if (query.pagenumber) { offset = query.pagenumber * no_of_product - no_of_product }
-        const [allProduct] = await knex('products').where('status', 'published').count();
-        result["total_page"] = Math.ceil(allProduct.count / no_of_product)
+      let total_page = 1
+      let limit = 10;
+      let values = []
+      let query = `
+        SELECT p.*, 
+        (
+          SELECT json_build_object(
+            'url', pi.url,
+            'originalname', pi.originalname
+          ) FROM product_images pi WHERE pi.product_id=p.pid LIMIT 1
+        ) as image
+        FROM products p
+        WHERE p.status='1'
+        ORDER BY p.create_date ASC
+      `
 
-        products = products.limit(no_of_product).offset(offset)
+      
+      if(params.hasOwnProperty('limit')) limit = params.limit
+      if(params.hasOwnProperty('page')){
+        let [totalProduct] = await knex('products').where("status", '1').count("title")
+        totalProduct = totalProduct ? totalProduct.count : 1
+        pagination = Math.ceil(totalProduct / limit)
+
+        let { page } = params;
+        let offset = (page * limit) - limit;
+        query += ` LIMIT ? OFFSET ? `
+        values.push(limit, offset)    
       }
 
-      products = await products;      
-      for (let i = 0; i < products.length; i++) {
-        const product = products[i];
-        let [image] = await knex("product_images").where("product_id", product.pid);
-        if(image){
-          product.url = image.url;
-          product.alt = image.originalname;
-        }
-      }
-      result["data"] = products;
-      return resolve(result);
+      const { rows: data } = await knex.raw(query, values)
+      return resolve({ total_page, data });
     } catch (error) {
       console.log(error)
       return reject(error);
@@ -90,13 +98,13 @@ exports.getProductOtherInfoModel = (query) => {
     // status = [total page number, title]
     try {
       if(query.status === 'count' && query.hasOwnProperty('no_of_product')) {
-         const [products] = await knex('products').where('status', 'published').count()
+         const [products] = await knex('products').where('status', '1').count()
          const total_page = Math.ceil(products.count / query.no_of_product)
          return resolve({ total_page })        
       }
 
       if(query.status === 'title'){
-        const products = await knex('products').where('status', 'published').select("title")
+        const products = await knex('products').where('status', '1').select("title")
         return resolve(products)
       }
 
@@ -116,7 +124,7 @@ exports.getProductByTablenameModel = (params, role) => {
 
       let products = knex("products").where(colname, value);
       if (role === "client")
-        products = products.andWhere("status", "published");
+        products = products.andWhere("status", "1");
 
       products = await products;
       if (!products || products.length === 0) return reject("Data not found");
@@ -139,28 +147,29 @@ exports.getProductByTablenameModel = (params, role) => {
   });
 };
 
-exports.getproductByTitleModel = (title) => {
-  return new Promise(async(resolve, reject) => {
-    if(!title || title === '') return reject('Params not found !')
+exports.getproductByTitleModel = async(title) => {
     try {
+      if(!title || title === '') throw ('Params not found !')
       title = title.replace(/-/g, ' ').toLowerCase();
 
-      const query = `SELECT * FROM products WHERE LOWER(title)=?`
+      const query = `
+        SELECT p.*, 
+        (
+          SELECT json_agg(json_build_object(
+            'url', pi.url,
+            'originalname', pi.originalname
+          )) FROM product_images pi WHERE pi.product_id=p.pid
+        ) as images        
+        FROM products p WHERE LOWER(p.title)=?
+      `
       const { rows: [product] } = await knex.raw(query, [title]) 
-      if(!product) return reject('Unknow Product')
+      if(!product) throw ('Unknow Product')
+      return product
 
-      const images = await knex('product_images').where({ product_id: product.pid })
-      if(images.length !== 0) {
-          product.url = images[0].url
-          product.alt = images[0].originalname
-          product.images = images
-      }
-
-      return resolve(product)
     } catch (error) {
-      return reject(error)
+      console.log(error)
+      return Promise.reject(error)
     }
-  })
 }
 
 exports.getProductByPIDModel = (pid) => {
@@ -262,33 +271,32 @@ exports.totalProductsModel = () => {
   });
 };
 
-exports.getProductByCategoryNameModel = (name) => {
-  return new Promise(async(resolve, reject) => {
+exports.getProductByCategoryNameModel = async(name) => {
     try {
       name = name.replace(/-/g, ' ').toLowerCase();
-      let query = `SELECT b.*, a.name as category_name FROM categorys as a INNER JOIN products as b ON a.id=b.category_id WHERE LOWER(a.name)=?`
+      let query = `SELECT 
+      p.*, 
+      (
+        SELECT json_build_object(
+          'url', pi.url,
+          'originalname', pi.originalname
+        ) FROM product_images pi WHERE pi.product_id=p.pid LIMIT 1
+      ) as image, 
+      c.name as category_name 
+      FROM categorys as c 
+      INNER JOIN products as p ON c.id=p.category_id 
+      WHERE LOWER(c.name)=?`
+
       const { rows: products } = await knex.raw(query, [name])
+      return products
 
-      for (let i = 0; i < products.length; i++) {
-        const product = products[i];
-        let images = await knex("product_images").where("product_id", product.pid);
-        if (images && Array.isArray(images) && images.length !== 0) {
-          product.images = images;
-          product.url = images[0].url;
-          product.alt = images[0].originalname;
-        }
-      }
-
-      return resolve(products)
     } catch (error) {
       console.log(error)
-      return reject(error)
+      return Promise.reject(error)
     }
-  })
 }
 
-exports.topSellingProductModel = (total = 7) => {
-  return new Promise(async (resolve, reject) => {
+exports.topSellingProductModel = async(total = 7) => {
     try {
       const orderList = await knex("orders")
         .where("status", "4")
@@ -310,78 +318,65 @@ exports.topSellingProductModel = (total = 7) => {
         .slice(0, total)
         .map(({ pid }) => pid);
 
-      let products = await knex("products")
-        .whereIn("pid", sortData)
-        .andWhere("status", "published")
-        .select("id", "pid", "title", "price", "on_sale", "category_id");
-      for (let i = 0; i < products.length; i++) {
-        const product = products[i];
-        const [image] = await knex("product_images").where("product_id", product.pid);
-        if(image){
-          product.url = image.url;
-          product.alt = image.originalname;
-        }
-       
-      }
+        const query = `
+        SELECT p.id, p.pid, p.title, p.price, p.on_sale, p.category_id, 
+        (
+          SELECT json_build_object(
+            'url', pi.url,
+            'originalname', pi.originalname
+          ) FROM product_images pi WHERE pi.product_id=p.pid LIMIT 1
+        ) as image       
+        FROM products p WHERE p.pid IN (${sortData.map(_ => '?').join(',')}) AND status='1'
+      `
 
-      return resolve(products);
+      const { rows: products } = await knex.raw(query, sortData)
+
+      return products
     } catch (error) {
       console.log(error)
-      return reject(error);
+      return Promise.reject(error);
     }
-  });
 };
 
-exports.getOnSellProductModel = () => {
-  return new Promise(async (resolve, reject) => {
+exports.getOnSellProductModel = async() => {
     try {
-      const products = await knex("products")
-        .where("status", "published")
-        .andWhere("on_sale", "1");
-      for (let i = 0; i < products.length; i++) {
-        const product = products[i];
-        const [image] = await knex("product_images").where("product_id", product.pid);
-        if(image) {
-          product.url = image.url;
-          product.alt = image.originalname;
-        }
-         
-        product.rating = await countRating(product.pid);
-      }
+      const query = `
+        SELECT p.*, 
+        (
+          SELECT json_build_object(
+            'url', pi.url,
+            'originalname', pi.originalname
+          ) FROM product_images pi WHERE pi.product_id=p.pid LIMIT 1
+        ) as image       
+        FROM products p WHERE status='1' AND on_sale='1'
+      `
+      const { rows: products } = await knex.raw(query);
 
-      return resolve(products);
+         
+        // product.rating = await countRating(product.pid);
+      return products;
     } catch (error) {
       console.log(error);
-      return reject(error);
+      return Promise.reject(error);
     }
-  });
 };
 
-exports.getSearchProductModel = (title, role) => {
-  return new Promise(async (resolve, reject) => {
+exports.getSearchProductModel = async(title, role) => {
     try {
-      let products;
-      if (role === "client") {
-        products = knex("products").where("status", "published");
-      } else {
-        products = knex("products");
-      }
-
-      products = await products.whereILike("title", `%${title}%`);
-      for (let i = 0; i < products.length; i++) {
-        const product = products[i];
-        let [image] = await knex("product_images").where(
-          "product_id",
-          product.pid
-        );
-
-        product.url = image.url;
-        product.alt = image.originalname;
-      }
-
-      return resolve(products);
+      const query = `
+        SELECT p.*, 
+        (
+          SELECT json_build_object(
+            'url', pi.url,
+            'originalname', pi.originalname
+          ) FROM product_images pi WHERE pi.product_id=p.pid LIMIT 1
+        ) as image       
+        FROM products p WHERE p.status='1' AND LOWER(title) LIKE LOWER('%${title}%')
+      `
+      const { rows: products } = await knex.raw(query)
+      return products
     } catch (error) {
-      return reject(error);
+      console.log(error)
+      return Promise.reject(error);
     }
-  });
 };
