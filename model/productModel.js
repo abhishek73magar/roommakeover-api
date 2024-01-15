@@ -76,7 +76,7 @@ exports.getProductModel = (params) => {
       if(params.hasOwnProperty('page')){
         let [totalProduct] = await knex('products').where("status", '1').count("title")
         totalProduct = totalProduct ? totalProduct.count : 1
-        pagination = Math.ceil(totalProduct / limit)
+        total_page = Math.ceil(totalProduct / limit)
 
         let { page } = params;
         let offset = (page * limit) - limit;
