@@ -59,46 +59,42 @@ exports.updateProductForAdminModel = async(body, files, pid) => {
     }
 }
 
-exports.getProductForAdminModel = (params) => {
-  return new Promise(async(resolve, reject) => {
+exports.getProductForAdminModel = async(params) => {
     try {
-      const result = { data: [], pagination: 1 };
-      let products = knex('products').orderBy("create_date", 'desc')
+      let pagination = 1;
+      let limit = 40;
+      // let products = knex('products').orderBy("create_date", 'desc')
+      const values = []
 
-      if (params.hasOwnProperty("total")) {
-        // console.log(params);
-        let total = params.total;
-        let offset = 0;
-        if (params.pagenumber) {
-          offset = params.pagenumber * total - total;
-        }
-        const allData = await products;
-        result["pagination"] = Math.ceil(allData.length / total);
+      let query = `
+        SELECT p.*,
+        (
+          SELECT pi.url FROM product_images pi WHERE pi.product_id=p.pid LIMIT 1
+        ) AS url
+        FROM products p
+      `
 
-        products = products.limit(total).offset(offset);
+      if(params.hasOwnProperty('limit')) limit = params.limit || 10
+      query += ` ORDER BY p.create_date DESC `
+
+      if(params.hasOwnProperty('page')){
+        let [totalProduct] = await knex('products').count("title")
+        totalProduct = totalProduct ? totalProduct.count : 1
+        pagination = Math.ceil(totalProduct / limit)
+
+        let { page } = params;
+        let offset = (page * limit) - limit;
+        query += ` LIMIT ? OFFSET ? `
+        values.push(limit, offset)          
       }
 
-      products = await products;
+      const { rows: data } = await knex.raw(query, values)
+      return { data, pagination }
 
-      for(let i = 0; i < products.length; i++){
-        const product = products[i]
-        const [image] = await knex('product_images').where('product_id', product.pid)
-        if(image){
-          product.url = image.url;
-          product.originalname = image.originalname;
-        }
-        
-      }
-
-      if(!params.hasOwnProperty('total')) { return resolve(products) }
-
-      result["data"] = products
-      return resolve(result)
     } catch (error) {
       console.log(error)
-      return reject(error)
+      return Promise.reject(error)
     }
-  })
 }
 
 exports.getProductByPIDForAdminModel = (pid) => {
@@ -118,9 +114,7 @@ exports.getProductByPIDForAdminModel = (pid) => {
 exports.getProductSingleImageModel = (body) => {
   return new Promise(async(resolve, reject) => {
     try {
-      
       const images = await knex('product_images').whereIn('product_id', body.id)
-
       return resolve(images.reduce((prev, curr) => {
         const check = prev.some((item) => item.product_id === curr.product_id)
         if(!check) prev.push(curr)

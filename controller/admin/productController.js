@@ -22,7 +22,7 @@ exports.updateProductForAdminController =(req, res) => {
 }
 
 exports.getProductForAdminController = (req, res) => {
-  getProductForAdminModel(req.params)
+  getProductForAdminModel(req.query)
   .then(data => res.status(200).json(data))
   .catch(err => res.status(400).send(err))
 }

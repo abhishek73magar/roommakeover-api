@@ -18,8 +18,6 @@ router
   .patch('/product/:pid', uploadProductImage, updateProductForAdminController)
   .post('/product/image', getProductSingleImageConroller)
   .get('/product', getProductForAdminController)
-  .get('/product/page/:total', getProductForAdminController)
-  .get('/product/page/:total/:pagenumber', getProductForAdminController)
   .get('/product/:pid', getProductByPIDForAdminController)
   .delete('/product/:pid', deleteProductForAdminController);
 

@@ -31,9 +31,11 @@ exports.getOrderByIdForAdminModel = (collection_id) => {
   return new Promise(async(resolve, reject) => {
     try {
       const query = `
-        SELECT a.*, b.url FROM orders as a 
-        INNER JOIN product_images AS b ON a.product_id=b.product_id 
-        WHERE a.collection_id=?
+        SELECT a.*, (
+          SELECT pi.url from product_images pi where pi.product_id=a.product_id LIMIT 1
+        ) as url 
+        FROM orders a
+        WHERE collection_id=?
         `
       const { rows } = await knex.raw(query, [collection_id])
       if(rows.length === 0) return reject("Order not found !")
