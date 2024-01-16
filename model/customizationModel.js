@@ -1,11 +1,10 @@
-const { file } = require("googleapis/build/src/apis/file")
 const knex = require("../db")
 const { removeFile } = require("../libs/removeFile")
 
 exports.addCustomizationModel = async(body, files) => {
   const tnx = await knex.transaction()  
   try {
-      const [product] = await tnx('customization_product').insert(body).return('*')
+      const [product] = await tnx('customization_product').insert(body).returning('*')
       if(Array.isArray(files) && files.length > 0) {
         const images = files.map((item) => {
           const originalname = item.originalname;

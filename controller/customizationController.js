@@ -5,10 +5,10 @@ const { addCustomizationModel, getCustomizationProductModel } = require("../mode
 exports.uploadCustomizationImage = multer({
   storage: fileUpload("public/customization-product"),
   fileFilter: imageFilter,
-}).array("customiazation-images");
+}).array("customization-images");
 
 exports.addCustomizationController = (req, res) => {
-  addCustomizationModel(req.boyd, req.files)
+  addCustomizationModel(req.body, req.files)
     .then(msg => res.status(201).send(msg))
     .catch(err => res.status(400).send(err))
 }
