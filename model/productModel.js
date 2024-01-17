@@ -159,13 +159,22 @@ exports.getproductByTitleModel = async(title) => {
             'url', pi.url,
             'originalname', pi.originalname
           )) FROM product_images pi WHERE pi.product_id=p.pid
-        ) as images        
+        ) as images,
+        CASE
+          WHEN (
+            SELECT COUNT(*) FROM reviews r WHERE r.product_id=p.pid
+          ) > 0
+          THEN (
+            SELECT 
+            SUM(r.rating)::NUMERIC/COUNT(*)
+            FROM reviews r WHERE r.product_id=p.pid
+          ) ELSE NULL
+          END as rating        
         FROM products p WHERE LOWER(p.title)=?
       `
       const { rows: [product] } = await knex.raw(query, [title]) 
       if(!product) throw ('Unknow Product')
       return product
-
     } catch (error) {
       console.log(error)
       return Promise.reject(error)
