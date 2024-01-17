@@ -6,6 +6,9 @@ const allFolder = [
   'videos'
 ]
 
+const publicFolderCheck = fs.existsSync('public')
+if(!publicFolderCheck) fs.mkdirSync('public')
+
 allFolder.forEach((folderName) => {
   const path = `public/` + folderName
   const check = fs.existsSync(path)

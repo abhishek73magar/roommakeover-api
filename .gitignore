@@ -2,6 +2,7 @@
 /.env
 /public/videos
 /public
+/public/*
 
 yarn.lock
 package-lock.json
