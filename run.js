@@ -6,17 +6,12 @@ const allFolder = [
   'videos'
 ]
 
-const publicFolderCheck = fs.existsSync('public')
-if(!publicFolderCheck) fs.mkdirSync('public')
-
+if(!fs.existsSync('public')) fs.mkdirSync('public')
 allFolder.forEach((folderName) => {
   const path = `public/` + folderName
-  const check = fs.existsSync(path)
-  if(check) { 
-    console.info(`${folderName} already exits \n`)
-  } else {
-    console.info(`${folderName} folder name not found ! \n`)
-    fs.mkdirSync(path)
-    
-  }
+  if(fs.existsSync(path)) return
+  
+  fs.mkdirSync(path)
+  console.info(`${folderName} folder created ! \n`)
+
 })
