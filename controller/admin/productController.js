@@ -1,5 +1,5 @@
 const multer = require("multer");
-const { addProductForAdminModel, updateProductForAdminModel, getProductForAdminModel, getProductByPIDForAdminModel, deleteProductForAdminModel, getProductSingleImageModel } = require("../../model/admin/productModel");
+const { addProductForAdminModel, updateProductForAdminModel, getProductForAdminModel, getProductByPIDForAdminModel, deleteProductForAdminModel, getProductSingleImageModel, getProductImagesModel, deleteProductImageModel } = require("../../model/admin/productModel");
 const { fileUpload, imageFilter } = require("../../libs/fileUpload");
 
 
@@ -17,7 +17,7 @@ exports.addProductForAdminController = (req, res) => {
 
 exports.updateProductForAdminController =(req, res) => {
   updateProductForAdminModel(req.body, req.files, req.params.pid)
-  .then(msg => res.status(200).send(msg))
+  .then(data => res.status(200).json(data))
   .catch(err => res.status(400).send(err))
 }
 
@@ -36,6 +36,19 @@ exports.getProductByPIDForAdminController =(req, res) => {
 exports.getProductSingleImageConroller = (req, res) => {
   getProductSingleImageModel(req.body)
     .then(data => res.status(200).json(data))
+    .catch(err => res.status(400).send(err))
+}
+
+exports.getProductImagesController = (req, res) => {
+  getProductImagesModel(req.params.pid)
+    .then(data => res.status(200).json(data))
+    .catch(err => res.status(400).send(err))
+}
+
+
+exports.deleteProductImageController = (req, res) => {
+  deleteProductImageModel(req.params.id)
+    .then(msg => res.status(200).send(msg))
     .catch(err => res.status(400).send(err))
 }
 

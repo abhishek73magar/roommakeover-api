@@ -7,6 +7,11 @@ exports.addProductForAdminModel = (body, files) => {
     const pid = uid(10);
     const tnx = await knex.transaction();
     try {
+      Object.keys(body).forEach((keys) => {
+        if(body[keys] === '') body[keys] = null
+        if(keys === 'colors') body[keys] = JSON.parse(body[keys])
+      })
+
       await tnx('products').insert({pid, ...body})
       if (files && Array.isArray(files) && files.length !== 0) {
         const fileList = files.map((file) => {
@@ -36,6 +41,7 @@ exports.updateProductForAdminModel = async(body, files, pid) => {
         if(keys === 'colors') body[keys] = JSON.parse(body[keys])
       })
 
+      let images = null
       if (Array.isArray(files) && files.length > 0) {
         const fileList = files.map((file) => {
           const name = file.filename;
@@ -44,13 +50,14 @@ exports.updateProductForAdminModel = async(body, files, pid) => {
           return { name, url, originalname, product_id: pid };
         });
 
-        await tnx("product_images").insert(fileList);
-      }
+        images = await tnx("product_images").insert(fileList).returning('*');
+
+      }     
 
       const obj = { ...body, update_date: new Date().toISOString() };
-      await tnx("products").where("pid", pid).update(obj);
+      const [response] = await tnx("products").where("pid", pid).update(obj).returning("*");
       await tnx.commit(); 
-      return "Product updated"
+      return { message: "product update", images, response }
     } catch (error) {
       console.log(error)
       await tnx.rollback()
@@ -109,6 +116,24 @@ exports.getProductByPIDForAdminModel = (pid) => {
       return reject(error)
     }
   })
+}
+
+exports.getProductImagesModel = (pid) => {
+  return knex('product_images').where('product_id', pid)
+}
+
+exports.deleteProductImageModel = async(id) => {
+  const tnx = await knex.transaction()
+  try {
+    const images = await tnx('product_images').where({ id }).delete().returning("*")
+
+    images.forEach((image) => removeFile(image.url))
+    await tnx.commit()
+    return "Product image removed"
+  } catch (error) {
+    await tnx.rollback()
+    return Promise.reject(error)
+  }
 }
 
 exports.getProductSingleImageModel = (body) => {

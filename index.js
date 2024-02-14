@@ -6,6 +6,11 @@ const cors = require("cors");
 //const server = http.createServer(server);
 const cookieParser = require("cookie-parser");
 const { auth } = require("./libs/auth");
+const origins = require("./config/origins");
+const { checkAdminUser } = require("./model/admin/adminAuthModel");
+const adminAuth = require("./libs/adminAuth");
+checkAdminUser()
+
 const port = process.env.PORT;
 // console.log(corsList.split(","));
 
@@ -14,30 +19,7 @@ app.use("/api/image", express.static("public"));
 app.use(express.json());
 
 
-app.use(
-  cors({
-    origin: [
-      "http://localhost:3000",
-      "http://localhost:3001",
-      "http://localhost:3002",
-      "http://localhost:4000",
-      "https://online-shop-three-beryl.vercel.app",
-      "https://roommakeover.theminiland.com",
-      "https://admin.theminiland.com",
-      "https://roommakeover.com.np",
-      "https://admin.roommakeover.com.np",
-      "https://www.roommakeover.com.np",
-      "https://alpha.roommakeover.com.np",
-      "https://dashboard.roommakeover.com.np",
-      "http://dashboard.roommakeover.com.np",
-      "http://78.46.201.98:9002",
-      "http://78.46.201.98:9000",
-      "https://beta.roommakeover.com.np",
-      "https://betaadmin.roommakeover.com.np"
-    ],
-    credentials: true,
-  })
-);
+app.use(cors({ origin: origins, credentials: true }));
 // app.use(auth);
 app.use((req, res, next) => { console.log(req.method, "-", req.url, "-", new Date().toISOString()); return next()})
 app.use('/api/admin', require("./router/adminRouter"))

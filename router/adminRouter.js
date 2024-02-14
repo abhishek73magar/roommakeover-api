@@ -6,11 +6,21 @@ const { uploadHobbieThumbnail, addHobbieForAdminController, updateHobbieForAdmin
 const { addHobbieProductController, updateHobbieProductController, uploadHobbieProductThumbnail, getHobbieProductController, getHobbieProductByIdController, deleteHobbieProductController } = require('../controller/admin/hobbieProductController');
 const { addMediaController, getMediaController, deleteMediaController, uploadMedia } = require('../controller/admin/mediaController');
 const { getOrderForAdminController, updateOrderForAdminController, getOrderByIdForAdminController } = require('../controller/admin/orderController');
-const { addProductForAdminController, uploadProductImage, updateProductForAdminController, getProductForAdminController, getProductByPIDForAdminController, deleteProductForAdminController, getProductSingleImageConroller } = require('../controller/admin/productController');
+const { addProductForAdminController, uploadProductImage, updateProductForAdminController, getProductForAdminController, getProductByPIDForAdminController, deleteProductForAdminController, getProductSingleImageConroller, getProductImagesController, deleteProductImageController } = require('../controller/admin/productController');
 const { uploadSliderImage, addSliderImageController, deleteSliderImageController, getSliderImageController } = require('../controller/admin/sliderImageController');
+
+const adminAuthController = require('../controller/admin/adminAuthController');
 
 const router = require('express').Router();
 
+// admin list
+router
+  .post('/login', adminAuthController.login)
+  .post('/admin', adminAuthController.create)
+  .patch('/admin', adminAuthController.update)
+  .get('/admin', adminAuthController.read)
+  .get('/admin/:id', adminAuthController.findById)
+  .delete('/admin/:id', adminAuthController.remove)
 
 // // for product
 router
@@ -18,7 +28,9 @@ router
   .patch('/product/:pid', uploadProductImage, updateProductForAdminController)
   .post('/product/image', getProductSingleImageConroller)
   .get('/product', getProductForAdminController)
+  .get('/product/image/:pid', getProductImagesController)
   .get('/product/:pid', getProductByPIDForAdminController)
+  .delete('/product/image/:id', deleteProductImageController)
   .delete('/product/:pid', deleteProductForAdminController);
 
 

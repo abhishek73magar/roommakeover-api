@@ -21,7 +21,7 @@ exports.addCategoryForAdminController = (req, res) => {
 
 exports.updateCategoryForAdminController = (req, res) => {
   updateCategoryForAdminModel(req.body, req.file, req.params.id)
-    .then((message) => res.status(200).json({ message }))
+    .then((data) => res.status(200).json(data))
     .catch((err) => res.status(400).send(err));
 };
 
