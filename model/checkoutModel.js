@@ -117,7 +117,6 @@ exports.getCheckoutModel = (user) => {
       `
 
       const { rows: products } = await knex.raw(query, [user.id])
-      console.log(products)
       return resolve(products);
     } catch (error) {
       console.log(error);
