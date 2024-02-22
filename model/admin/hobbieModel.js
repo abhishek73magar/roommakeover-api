@@ -14,8 +14,8 @@ exports.addHobbieForAdminModel = (body, files) => {
 
       }
 
-      await knex('hobbies').insert(obj)
-      return resolve("Hobbie added")
+      const [response] = await knex('hobbies').insert(obj).returning("*")
+      return resolve(response)
     } catch (error) {
       console.log(error)
       if (files) {
@@ -39,8 +39,8 @@ exports.updateHobbieForAdminModel = (body, files, id) => {
         removeFile(hobbie.thumbnail)
       }
 
-      await knex('hobbies').where("id", id).update(obj)
-      return resolve("Hobbie updated")
+      const [hobbie] = await knex('hobbies').where("id", id).update(obj).returning("*")
+      return resolve(hobbie)
     } catch (error) {
       if (files) {
         const path = 'hobbies/' + files[0].filename;

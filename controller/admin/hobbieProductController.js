@@ -32,7 +32,7 @@ exports.getHobbieProductByIdController = (req, res) => {
 }
 
 exports.deleteHobbieProductController = (req, res) => {
-    deleteHobbieProductModel()
+    deleteHobbieProductModel(req.params.id)
       .then(msg => res.status(200).send(msg))
       .catch(err => res.status(400).send(err))
 }

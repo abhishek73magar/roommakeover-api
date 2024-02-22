@@ -5,22 +5,19 @@ exports.addDIYProductModel = (body, file) => {
   return new Promise(async(resolve, reject) => {
     const tnx = await knex.transaction();
     try {
-      if(file) { body.thumbnail = `diy-products/` + file.filename }
+      if(file) { body.thumbnail = `diy-products/${file.filename}` }
       let products = JSON.parse(body.products);
       delete body.products;
 
       const [diy_product] = await tnx('diy_products').insert(body).returning("id")
-      
-      products = products.map((product_id) => {
-        return { product_id, diy_id: diy_product.id }
-      })
+      products = products.map((product_id) => ({ product_id, diy_id: diy_product.id }))
 
       await tnx('diy_product_list').insert(products)
 
       await tnx.commit();
       return resolve("DIY Product added")
     } catch (error) {
-      if(file){ removeFile(`DIY-products/${file.filename}`)}
+      if(file){ removeFile(`diy-products/${file.filename}`)}
       console.log(error)
       return reject(error)
     }
@@ -31,31 +28,25 @@ exports.updateDIYProductModel = (body, file, id) => {
   return new Promise(async(resolve, reject) => {
     const tnx = await knex.transaction();
     try {
-      if(file) { body.thumbnail = `diy-products/` + file.filename }      
-      const productList = await knex('diy_product_list').where('diy_id', id)
       let products = JSON.parse(body.products);
+      const [diy] = await knex('diy_products').select("thumbnail").where({ id })
 
-      const removeProduct = productList.reduce((prev, curr) => {
-        const check = products.some(item => item === curr.product_id);
-        if(!check) { prev.push(curr.id) }
-        return prev;
-      }, [])
+      if(file) { body.thumbnail = `diy-products/${file.filename}` }      
       
-      const newProduct = products.reduce((prev, product_id) => {
-        const check = productList.some(item => item.product_id === product_id)
-        if(!check) { prev.push({ product_id, diy_id: id }) }
-        return prev;
-      }, [])
-
-      if(Array.isArray(removeProduct) && removeProduct.length !== 0) await tnx('diy_product_list').whereIn('id', removeProduct).delete();
-      if(Array.isArray(newProduct) && newProduct.length !== 0) await tnx('diy_product_list').insert(newProduct)
+      if(Array.isArray(products) && products.length > 0){
+        const diyProductList = products.map((product_id) => ({ product_id, diy_id: id }))
+        await tnx('diy_product_list').where('diy_id', id).delete()
+        await tnx('diy_product_list').insert(diyProductList)
+      }
       
       delete body.products;
-      console.log(body, newProduct, removeProduct)
-      await tnx('diy_products').where('id', id).update(body)
+      const [diyProduct] = await tnx('diy_products').where('id', id).update(body).returning("*")
+      if(diy.thumbnail !== '') {
+        if(body.thumbnail === '' || body.thumbnail !== diy.thumbnail) { removeFile(diy.thumbnail) }
+      }
 
       await tnx.commit();
-      return resolve("DIY Product updated")
+      return resolve({ ...diyProduct, products })
     } catch (error) {
       console.log(error)
       if(file){ removeFile(`diy-products/${file.filename}`)}
@@ -64,38 +55,25 @@ exports.updateDIYProductModel = (body, file, id) => {
   })
 }
 
-exports.getDIYProductModel = async() => {
-    try {   
-      const products = await knex("diy_products").orderBy("id", "DESC")
-      return products;
-    } catch (error) {
-      console.log(error)
-      return error;
-    }
+exports.getDIYProductModel = () => {
+  return knex("diy_products").orderBy("id", "DESC")
 }
 
-exports.getDIYProductByIdModel = (id) => {
-  return new Promise(async(resolve, reject) => {
-    try { 
-      const [DIYProduct] = await knex('diy_products').where('id', id)
-      const query = `
-          SELECT a.*, b.url from diy_product_list AS a
-          INNER JOIN product_images AS b ON a.product_id=b.product_id 
-          WHERE a.diy_id=?
-        `
-      const { rows } = await knex.raw(query, [id])
-      const productList = rows.reduce((prev, curr) => {
-        const check = prev.some((item) => item.product_id === curr.product_id)
-        if(!check) prev.push(curr)
-        return prev;
-      }, [])
-
-      return resolve({ DIYProduct, productList })
-    } catch (error) {
-      console.log(error)
-      return reject(error)
-    }
-  })
+exports.getDIYProductByIdModel = async(id) => {
+  try { 
+    const query = `
+      SELECT *, (
+        SELECT json_agg(product_id) FROM diy_product_list dpl WHERE dpl.diy_id=dp.id
+      ) AS products FROM diy_products dp WHERE dp.id=?
+    `
+    const { rows } = await knex.raw(query, [id])
+    if(rows.length === 0) return null
+    return rows[0]
+  } catch (error) {
+    console.log(error)
+    return Promise.reject(error)
+  }
+ 
 }
 
 exports.deleteDIYProductModel = (id) => {

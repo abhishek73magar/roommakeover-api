@@ -10,6 +10,7 @@ const { addProductForAdminController, uploadProductImage, updateProductForAdminC
 const { uploadSliderImage, addSliderImageController, deleteSliderImageController, getSliderImageController } = require('../controller/admin/sliderImageController');
 
 const adminAuthController = require('../controller/admin/adminAuthController');
+const { getCustomerController } = require('../controller/admin/customerController');
 
 const router = require('express').Router();
 
@@ -17,7 +18,7 @@ const router = require('express').Router();
 router
   .post('/login', adminAuthController.login)
   .post('/admin', adminAuthController.create)
-  .patch('/admin', adminAuthController.update)
+  .patch('/admin/:id', adminAuthController.update)
   .get('/admin', adminAuthController.read)
   .get('/admin/:id', adminAuthController.findById)
   .delete('/admin/:id', adminAuthController.remove)
@@ -106,6 +107,11 @@ router
   .get('/customization-product', getCustomizationController)
   .get('/customization-product/:id', getCustomizationByIdController)
   .delete('/customization-prdoduct/:id', removeCustomizationController)
+
+
+// customers
+router
+  .get('/customer', getCustomerController)
 
 
 module.exports = router;

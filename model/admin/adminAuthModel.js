@@ -25,23 +25,45 @@ const  create = (body) => {
   return knex('admin').insert(body).returning('*')
 } 
 
-const update = (body, id) => {  
-  if(body.hasOwnProperty('password')) {
-    body.password = bcrypt.hashSync(body.password, salt)
+const update = async(body, id) => {
+  try {
+    delete body.role_id
+    if(body.hasOwnProperty('password')) {
+      body.password = bcrypt.hashSync(body.password, salt)
+    }
+    const [admin] = await knex('admin').where({ id }).update(body).returning("*")
+    delete admin.password
+    return admin;
+  } catch (error) {
+    return Promise.reject(error)
   }
-  return knex('admin').where({ id }).update(body)
+  
 }
 
 const read = () => {
-  return knex('admin')
+  return knex('admin').orderBy("id", 'asc')
+  .then((res) => res.map((item) => {
+    delete item.password
+    return item;
+  }))
 }
 
 const findById = (id) => {
-  return knex('admin').where({ id })
+  return knex('admin').where({ id }).then(res => res.map((item) => { delete item.password; return item }) )
+
 }
 
-const remove = (id) => {
-  return knex('admin').where({ id })
+const remove = async(id) => {
+  const tnx = await knex.transaction()
+  try {
+    const [admin] = await tnx('admin').where({ id }).delete().returning("role_id")
+    if(admin.role_id === 1) throw "You cann't delete main admin"
+    await tnx.commit()
+    return "Admin removed"
+  } catch (error) {
+    await tnx.rollback()
+    return Promise.reject(error)
+  }
 }
 
 const login = async(body) => {

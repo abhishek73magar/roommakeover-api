@@ -8,7 +8,7 @@ exports.uploadSliderImage = multer({
 }).array('slider-images');
 
 exports.addSliderImageController = (req, res) => {
-  addSliderImageModel(req.files)
+  addSliderImageModel(req.body, req.files)
     .then(data => res.status(201).json(data))
     .catch(err => res.status(400).send(err))
 }

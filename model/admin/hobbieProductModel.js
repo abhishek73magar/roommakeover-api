@@ -5,7 +5,7 @@ exports.addHobbieProductModel = (body, file) => {
   return new Promise(async(resolve, reject) => {
     const tnx = await knex.transaction();
     try {
-      if(file) { body.thumbnail = `hobbie-products/` + file.filename }
+      if(file) { body.thumbnail = `hobbie-products/${file.filename}` }
       let products = JSON.parse(body.products);
       delete body.products;
 
@@ -30,30 +30,26 @@ exports.updateHobbieProductModel = (body, file, id) => {
   return new Promise(async(resolve, reject) => {
     const tnx = await knex.transaction();
     try {
-      if(file) { body.thumbnail = `hobbie-products/` + file.filename }    
-      const productList = await knex('hobbie_product_list').where('hobbie_product_id', id)
       let products = JSON.parse(body.products);
+      const [hobbie] = await knex('hobbie_products').select("thumbnail").where({ id })
 
-      const removeProduct = productList.reduce((prev, curr) => {
-        const check = products.some(i => i.hobbie_product_id === curr.product_id);
-        if(!check) { prev.push(curr.id) }
-        return prev;
-      }, [])
-      
-      const newProduct = products.reduce((prev, product_id) => {
-        const check = productList.some(item => item.id === product_id)
-        if(!check) { prev.push({ product_id, hobbie_product_id: id }) }
-        return prev;
-      }, [])
+      if(file) { body.thumbnail = `hobbie-products/${file.filename}` }    
 
-      if(Array.isArray(newProduct) && newProduct.length !== 0) await tnx('hobbie_product_list').whereIn('id', removeProduct).delete()
-      if(Array.isArray(newProduct) && newProduct.length !== 0) await tnx('hobbie_product_list').insert(newProduct)
-      
+      if(Array.isArray(products) && products.length > 0){
+        const diyProductList = products.map((product_id) => ({ product_id, hobbie_product_id: id }))
+        await tnx('hobbie_product_list').where('hobbie_product_id', id).delete()
+        await tnx('hobbie_product_list').insert(diyProductList)
+      }
+
       delete body.products;
-      await tnx('hobbie_products').where('id', id).update(body)
+      const [hobbieProduct] = await tnx('hobbie_products').where('id', id).update(body).returning('*')
+      console.log(body.thumbnail, hobbie.thumbnail)
+      if(hobbie.thumbnail !== '') {
+        if(body.thumbnail === '' || body.thumbnail !== hobbie.thumbnail) { removeFile(hobbie.thumbnail) }
+      }
 
       await tnx.commit();
-      return resolve("Hobbie Product updated")
+      return resolve({ ...hobbieProduct, products })
     } catch (error) {
       console.log(error)
       if(file){ removeFile(`hobbie-products/${file.filename}`)}
@@ -63,44 +59,32 @@ exports.updateHobbieProductModel = (body, file, id) => {
 }
 
 exports.getHobbieProductModel = () => {
-  return new Promise(async(resolve, reject) => {
-    try {
-      let query = `
-          SELECT a.*, b.name as category FROM hobbie_products as a
-          INNER JOIN categorys as b ON a.category_id=b.id
-        `
-      const { rows } = await knex.raw(query);
-      return resolve(rows)
-    } catch (error) {
-      console.log(error)
-      return reject(error)
-    }
-  })
+  return knex('hobbie_products').orderBy('id', 'desc')
 }
 
-exports.getHobbieProductByIdModel = (id) => {
-  return new Promise(async(resolve, reject) => {
+exports.getHobbieProductByIdModel = async(id) => {
     try { 
-      const [hobbieProduct] = await knex('hobbie_products').where('id', id)
       const query = `
-          SELECT a.*, b.url from hobbie_product_list AS a
-          INNER JOIN product_images AS b ON a.product_id=b.product_id 
-          WHERE hobbie_product_id=?
-        `
-    const { rows } = await knex.raw(query, [id])
-    const productList = rows.reduce((prev, curr) => {
-    const check = prev.some((item) => item.product_id === curr.product_id)
-    if(!check) prev.push(curr)
-    return prev;
-  }, [])
-      return resolve({ hobbieProduct, productList })
+        SELECT *, (
+          SELECT json_agg(product_id) FROM hobbie_product_list hpl WHERE hpl.hobbie_product_id=hp.id
+        ) AS products FROM hobbie_products hp WHERE hp.id=?
+      `
+      const { rows } = await knex.raw(query, [id])
+      if(rows.length === 0) return null
+      return rows[0]
     } catch (error) {
       console.log(error)
-      return reject(error)
+      return Promise.reject(error)
     }
-  })
 }
 
-exports.deleteHobbieProductModel = (id) => {
-  return knex('hoobie_product').where('id', id).delete()
+exports.deleteHobbieProductModel = async(id) => {
+  try {
+    const [hobbieProduct] = await knex('hobbie_products').where('id', id).delete().returning("*")
+    if(hobbieProduct.thumbnail && hobbieProduct.thumbnail !== '') removeFile(hobbieProduct.thumbnail)
+    return "Hobbie Product Removed"
+  } catch (error) {
+    console.log(error)
+    return Promise.reject(error)
+  } 
 }

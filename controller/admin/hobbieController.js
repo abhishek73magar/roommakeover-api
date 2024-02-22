@@ -10,13 +10,13 @@ exports.uploadHobbieThumbnail = multer({
 
 exports.addHobbieForAdminController = (req, res) => {
   addHobbieForAdminModel(req.body, req.files)
-    .then(msg => res.status(201).send(msg))
+    .then(data => res.status(201).json(data))
     .catch(err => res.status(400).send(err))
 }
 
 exports.updateHobbieForAdminController = (req, res) => {
   updateHobbieForAdminModel(req.body, req.files, req.params.id)
-    .then(msg => res.status(200).send(msg))
+    .then(data => res.status(200).json(data))
     .catch(err => res.status(400).send(err))
 }
 

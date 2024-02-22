@@ -82,29 +82,6 @@ exports.updateCheckoutModel = (body, id) => {
 exports.getCheckoutModel = (user) => {
   return new Promise(async (resolve, reject) => {
     try {
-      // const products = await knex("checkout as a")
-      //   .join("products as b", "a.product_id", "b.pid")
-      //   .where("a.user_id", user.id)
-      //   .select("a.*", "b.pid", "b.title", "b.price", "b.new_price", "b.is_discount");
-
-      // for (let i = 0; i < products.length; i++) {
-      //   const product = products[i];
-      //   const [image] = await knex("product_images").where("product_id", product.pid);
-      //   product.url = image.url;
-      //   product.alt = image.originalname;
-      // }
-      // let query = `
-      //   SELECT p.*, 
-      //   (
-      //     SELECT json_build_object(
-      //       'url', pi.url,
-      //       'originalname', pi.originalname
-      //     ) FROM product_images pi WHERE pi.product_id=p.pid LIMIT 1
-      //   ) as image
-      //   FROM products p
-      //   WHERE p.status='1'
-      //   ORDER BY p.create_date ASC
-      // `
       let query = `
         SELECT c.*, 
         p.pid, p.title, p.price, p.new_price, p.is_discount, 

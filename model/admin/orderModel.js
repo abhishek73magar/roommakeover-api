@@ -1,30 +1,45 @@
 const knex = require("../../db")
+const _ = require('loadsh')
 
-exports.getOrderForAdminModel = () => {
-  return new Promise(async(resolve, reject) => {
+exports.getOrderForAdminModel = async() => {
     try {
-      const orders = await knex('orders').orderBy("date", 'DESC')
+      // const orders = await knex('orders').orderBy("date", 'DESC')
 
-      const newOrderList = orders.reduce((prev, curr) => {
-        const order = prev.find(item => item.collection_id === curr.collection_id)
-        if(order) { order.total_product += 1; order.total_price += curr.qty * curr.price }
-        else { prev.push({ ...curr, total_product: 1, total_price: curr.qty * curr.price }) }
-        return prev;
-      }, [])
+      // const newOrderList = orders.reduce((prev, curr) => {
+      //   const order = prev.find(item => item.collection_id === curr.collection_id)
+      //   if(order) { order.total_product += 1; order.total_price += curr.qty * curr.price }
+      //   else { prev.push({ ...curr, total_product: 1, total_price: curr.qty * curr.price }) }
+      //   return prev;
+      // }, [])
 
-      const orderLength = newOrderList.length;
-      for(let i = 0; i < orderLength; i++){
-        const order = newOrderList[i]
-        const [billing] = await knex('billing_address').where('id', order.address_id).returning("fullname")
-        order.fullname = billing.fullname
-      }
+      // const orderLength = newOrderList.length;
+      // for(let i = 0; i < orderLength; i++){
+      //   const order = newOrderList[i]
+      //   const [billing] = await knex('billing_address').where('id', order.address_id).returning("fullname")
+      //   order.fullname = billing.fullname
+      // }
 
-      return resolve(newOrderList)
+      // return resolve(newOrderList)
+      const query = `
+        SELECT o.*, (
+          SELECT fullname FROM billing_address ba WHERE ba.id=o.address_id LIMIT 1
+        ) as fullname FROM orders o ORDER BY o.date DESC 
+      `
+
+      const { rows } = await knex.raw(query)
+      const result = _(rows).groupBy('collection_id').map((item, key) =>{
+        const total_product = item.length;
+        const total_price = item.reduce((prev, curr) => prev + (curr.qty * curr.price), 0)
+        const fullname = item[0].fullname
+        // const date = item[0].date
+        return ({ collection_id: key, fullname, total_product, total_price, orders: item })
+      }).value()
+
+      return result
     } catch (error) {
       console.log(error)
-      return reject(error)
+      return Promise.reject(error)
     }
-  })
 }
 
 exports.getOrderByIdForAdminModel = (collection_id) => {

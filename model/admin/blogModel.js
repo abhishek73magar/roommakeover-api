@@ -16,22 +16,27 @@ exports.addBlogModel = async(body, file) => {
 exports.updateBlogModel = async(body, file, id) => {
   const tnx = await knex.transaction()
   try {
-    const [blog] = await knex('blogs').where('id', id)
+    const [blogImage] = await knex('blogs').where('id', id).select('thumbnail')
+    if(!blogImage) throw "Blog not found !"
 
     if(file) { body.thumbnail = "blog/" +  file.filename  }
-    await knex("blogs").where('id', id).update({ ...body, update_time: new Date().toISOString() })
-    if(!!blog && file) { removeFile(blog.thumbnail) }
+    const [blog] = await tnx("blogs").where('id', id).update({ ...body, update_time: new Date().toISOString() }).returning("*")
+    if(blogImage.thumbnail !== '') {
+      if(body.thumbnail === '' || body.thumbnail !== blogImage.thumbnail) { removeFile(blogImage.thumbnail) }
+    }
 
-    return "Blog update successfully"
+    await tnx.commit()
+    return blog
   } catch (error) {
     console.log(error)
+    await tnx.rollback()
     if(file) { removeFile(`blog/${file.filename}`)}
 
-    return error;
+    return Promise.reject(error);
   }
 }
 exports.getBlogModel = () => {
-  return knex('blogs')
+  return knex('blogs').orderBy('index', 'asc')
 }
 
 exports.getBlogByIdModel = async(id) => {
