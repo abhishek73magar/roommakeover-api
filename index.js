@@ -22,7 +22,7 @@ app.use(express.json());
 app.use(cors({ origin: origins, credentials: true }));
 // app.use(auth);
 app.use((req, res, next) => { console.log(req.method, "-", req.url, "-", new Date().toISOString()); return next()})
-app.use('/api/admin', require("./router/adminRouter"))
+app.use('/api/admin', adminAuth, require("./router/adminRouter"))
 app.use("/api", auth, require("./router/router"));
 
 

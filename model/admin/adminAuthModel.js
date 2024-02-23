@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt')
 const salt = bcrypt.genSaltSync(10)
 const { genToken } = require("../../libs/token");
 const { ADMIN_SECRET } = require("../../config/config");
+const moment = require('moment')
 
 
 const checkAdminUser = async() => {
@@ -68,17 +69,20 @@ const remove = async(id) => {
 
 const login = async(body) => {
   try {
-    const { email, password } = body;
+    const { email, password, stay } = body;
     const [admin] = await knex('admin').where({ email })
     if(!admin) throw "Invalid User !"
 
     const passwordStatus = bcrypt.compareSync(password, admin.password)
     if(!passwordStatus) throw "Invalid User !"
     delete admin.password
-    const token = genToken(admin, '7d', ADMIN_SECRET)
+    let expires = '7d'
+    if(stay) expires = '100d'
+    const token = genToken(admin, expires, ADMIN_SECRET)
 
     return token
   } catch (error) {
+    console.log(error)
     return Promise.reject(error)
   }
 }
