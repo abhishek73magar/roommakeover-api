@@ -11,6 +11,7 @@ const { uploadSliderImage, addSliderImageController, deleteSliderImageController
 
 const adminAuthController = require('../controller/admin/adminAuthController');
 const { getCustomerController } = require('../controller/admin/customerController');
+const { homeInfoController } = require('../controller/admin/infoController');
 
 const router = require('express').Router();
 
@@ -112,6 +113,11 @@ router
 // customers
 router
   .get('/customer', getCustomerController)
+
+
+// info routes
+router
+  .get('/info/home', homeInfoController)
 
 
 module.exports = router;
