@@ -10,7 +10,7 @@ const create = (req, res) => {
 
 const update = (req, res) => {
   adminModel.update(req.body, req.params.id)
-    .then(() => res.status(200).send("Update successfully"))
+    .then((data) => res.status(200).json(data))
     .catch((err) => res.status(400).send(err))
 }
 
