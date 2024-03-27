@@ -12,6 +12,7 @@ const { uploadSliderImage, addSliderImageController, deleteSliderImageController
 const adminAuthController = require('../controller/admin/adminAuthController');
 const { getCustomerController } = require('../controller/admin/customerController');
 const { homeInfoController } = require('../controller/admin/infoController');
+const { generateAuthUrlController, oAuthTokenVerifyController, testMailSendController } = require('../controller/admin/googleApiController');
 
 const router = require('express').Router();
 
@@ -118,6 +119,12 @@ router
 // info routes
 router
   .get('/info/home', homeInfoController)
+
+// google refreshtoken gen
+router
+  .post('/generate-auth-url', generateAuthUrlController)
+  .get('/oauth-code', oAuthTokenVerifyController)
+  .post('/test-mail', testMailSendController)
 
 
 module.exports = router;

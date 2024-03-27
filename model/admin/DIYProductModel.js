@@ -10,10 +10,11 @@ exports.addDIYProductModel = (body, file) => {
       delete body.products;
 
       const [diy_product] = await tnx('diy_products').insert(body).returning("id")
-      products = products.map((product_id) => ({ product_id, diy_id: diy_product.id }))
-
-      await tnx('diy_product_list').insert(products)
-
+      if(Array.isArray(products) && products.length > 0){
+        products = products.map((product_id) => ({ product_id, diy_id: diy_product.id }))
+        await tnx('diy_product_list').insert(products)
+      }
+      
       await tnx.commit();
       return resolve("DIY Product added")
     } catch (error) {

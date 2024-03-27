@@ -18,10 +18,7 @@ exports.addHobbieForAdminModel = (body, files) => {
       return resolve(response)
     } catch (error) {
       console.log(error)
-      if (files) {
-        const path = 'hobbies/' + files[0].filename;
-        removeFile(path);
-      }
+      if (files) { removeFile(`hobbies/${files[0].filename}`) }
       return reject(error)
     }
   })

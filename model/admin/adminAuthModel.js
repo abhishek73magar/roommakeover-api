@@ -3,14 +3,13 @@ const bcrypt = require('bcrypt')
 const salt = bcrypt.genSaltSync(10)
 const { genToken } = require("../../libs/token");
 const { ADMIN_SECRET } = require("../../config/config");
-const moment = require('moment')
 
 
 const checkAdminUser = async() => {
   try {
     const admin = await knex('admin').where('email', 'admin@roommakeover.com.np')
     if(admin.length === 0){
-      const password = bcrypt.hashSync('adminroommakeover123*#', salt)
+      const password = bcrypt.hashSync('roommakeover123*#', salt)
       const obj = { fullname: "admin", email: 'admin@roommakeover.com.np', password, status: 1, role_id: 1 }
       await knex('admin').insert(obj)
       console.log('admin created successfully')
@@ -28,10 +27,18 @@ const  create = (body) => {
 
 const update = async(body, id) => {
   try {
+    // console.log(body)
     delete body.role_id
-    if(body.hasOwnProperty('password')) {
-      body.password = bcrypt.hashSync(body.password, salt)
-    }
+    const [user] = await knex('admin').where({ id})
+    if(!user) throw "Admin user not found!"
+    const passwordStatus = bcrypt.compareSync(body.password, user.password)
+    if(!passwordStatus) throw "Old password incorrect"
+
+    if(body.hasOwnProperty('new_password') && body.new_password !== '') {
+      body.password = bcrypt.hashSync(body.new_password, salt)
+    } else { delete body.password }
+    delete body.new_password
+    
     const [admin] = await knex('admin').where({ id }).update(body).returning("*")
     delete admin.password
     return admin;
