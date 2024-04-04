@@ -16,7 +16,6 @@ exports.up = function(knex) {
 exports.down = function(knex) {
   return knex.schema.alterTable('hobbie_products', (table) => {
     table.bigint('category_id')
-    table.dropColumn('status')
     table.string('status', 255).alter().defaultTo(null).comment('published, unpublished, draft')
   })
 };
