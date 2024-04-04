@@ -9,7 +9,7 @@ const { auth } = require("./libs/auth");
 const origins = require("./config/origins");
 const { checkAdminUser } = require("./model/admin/adminAuthModel");
 const adminAuth = require("./libs/adminAuth");
-checkAdminUser()
+// checkAdminUser()
 
 const port = process.env.PORT;
 // console.log(corsList.split(","));

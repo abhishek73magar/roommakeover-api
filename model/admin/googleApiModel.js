@@ -1,6 +1,7 @@
 const { google } = require('googleapis')
 const fs = require('fs')
 const { MAIL_CLIENT_ID, MAIL_CLIENT_SECRET, MAIL_REDIRECT_URL, MAIL_USER } = require('../../config/config')
+const { mailTransporter } = require('../../libs/mailTransporter')
 
 let oauth2Client = new google.auth.OAuth2(MAIL_CLIENT_ID, MAIL_CLIENT_SECRET, MAIL_REDIRECT_URL);
 
@@ -49,7 +50,7 @@ exports.testMailSendModel = async(body) => {
         subject:'Test Email From roommakeover.com.np',
         html: "<p>This is test mail !!!</p>"
       }
-      // await mailTransporter(mailOptions)
+      await mailTransporter(mailOptions)
       return "success"
     } catch (error) {
       console.log(error)

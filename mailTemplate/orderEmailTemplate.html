@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    body{
+      background: #d0d0d09e;
+    }
+    
+    .container{
+      width: 98%;
+      max-width: 500px;
+      background-color: white;
+      margin-inline: auto;
+      font-family: sans-serif;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .heading{
+      padding: 20px 6px;
+      text-align: center;
+      font-size: 28px;
+      font-weight: 200;
+      background-color: rgb(27, 120, 120);
+      color:white;
+    }
+    
+    .text-container{
+      padding: 1rem 1.5rem;
+      font-size: 14px;
+    }
+
+    .order-info > a{
+      font-size: 16px;
+       font-weight: 600;
+       color: rgb(27, 120, 120);
+       text-decoration: none;
+    }
+
+    .table {
+      width: 100%;
+      text-align: left;
+      border-collapse: collapse;
+    }
+
+    .t-head > tr th, 
+    .t-body > tr td {
+      border: 1px solid #ccc;
+      padding: 10px;
+      width: 100%;
+      font-size: 13px;
+
+    }
+    .t-body > tr td:last-child{
+      min-width: 100px;
+    }
+
+    .link-button {
+      padding:10px;
+      background-color: rgb(27, 120, 120);
+      color: white !important;
+      text-decoration: none;
+      width: 100%;
+      border: none;
+      cursor: pointer;
+    }
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="heading">You Got New Order</div>
+    <div class="text-container">
+      Hi {{adminName}} <br />
+      <p>Just to let you know -- we've received your order {{orderId}}, and it is now being pending 
+        plz check it once.</p>
+      <div class="order-info">
+        <a href="{{orderLink}}">[Order # {{orderId}}] ({{time}})</a></div>
+
+      <br />
+      <table class="table">
+        <thead class="t-head">
+          <tr>
+            <th>Product</th>
+            <th>Quantity</th>
+            <th>Price</th>
+          </tr>
+        </thead>
+        <tbody class="t-body">
+          {{tableData}}
+
+          <tr>
+            <td colspan="2">Total</td>
+            <td>Rs {{totalprice}}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <br />
+      <a href="{{orderLink}}" class="link-button" target="_blank">Open Dashboard</a>
+      <br />
+      <br />
+      <div style="text-align: right;"><a href="http://roommakeover.com.np" target="_blank">https://roommakeover.com.np</a></ap></div>
+    </div>
+  </div>
+</body>
+</html>

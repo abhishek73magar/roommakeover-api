@@ -82,3 +82,13 @@ exports.updateOrderForAdminModel = (body, query) => {
     }
   })
 }
+
+exports.deleteOrderByIdModel = async(id) => {
+  try {
+    const [order] = await knex('orders').where({ id }).delete().returning("id")
+    return order
+  } catch (error) {
+    // console.log()
+    return Promise.reject(error)
+  }
+}

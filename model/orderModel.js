@@ -1,5 +1,6 @@
 const { uid } = require("uid");
 const knex = require("../db");
+const { orderMail } = require("../libs/orderMail");
 
 exports.addOrderModel = (body, user) => {
   return new Promise(async (resolve, reject) => {
@@ -14,6 +15,7 @@ exports.addOrderModel = (body, user) => {
       await tnx('checkout').where('user_id', user.id).delete();
 
       await tnx.commit();
+      orderMail(obj)
       return resolve('Order send')
     } catch (error) {
       console.log(error);

@@ -5,12 +5,12 @@ const { uploadDIYProductThumbnail, addDIYProductController, getDIYProductControl
 const { uploadHobbieThumbnail, addHobbieForAdminController, updateHobbieForAdminController, getHobbieForAdminController, getHobbieByIdForAdminController, deleteHobbieForAdminController } = require('../controller/admin/hobbieController');
 const { addHobbieProductController, updateHobbieProductController, uploadHobbieProductThumbnail, getHobbieProductController, getHobbieProductByIdController, deleteHobbieProductController } = require('../controller/admin/hobbieProductController');
 const { addMediaController, getMediaController, deleteMediaController, uploadMedia } = require('../controller/admin/mediaController');
-const { getOrderForAdminController, updateOrderForAdminController, getOrderByIdForAdminController } = require('../controller/admin/orderController');
+const { getOrderForAdminController, updateOrderForAdminController, getOrderByIdForAdminController, deleteOrderByIdController } = require('../controller/admin/orderController');
 const { addProductForAdminController, uploadProductImage, updateProductForAdminController, getProductForAdminController, getProductByPIDForAdminController, deleteProductForAdminController, getProductSingleImageConroller, getProductImagesController, deleteProductImageController } = require('../controller/admin/productController');
 const { uploadSliderImage, addSliderImageController, deleteSliderImageController, getSliderImageController } = require('../controller/admin/sliderImageController');
 
 const adminAuthController = require('../controller/admin/adminAuthController');
-const { getCustomerController } = require('../controller/admin/customerController');
+const { getCustomerController, deleteCustomerController } = require('../controller/admin/customerController');
 const { homeInfoController } = require('../controller/admin/infoController');
 const { generateAuthUrlController, oAuthTokenVerifyController, testMailSendController } = require('../controller/admin/googleApiController');
 
@@ -42,7 +42,7 @@ router
   .get("/order", getOrderForAdminController)
   .get('/order/:collection_id', getOrderByIdForAdminController)
   .patch("/order", updateOrderForAdminController)
-  .delete('/order/:collection_id')
+  .delete('/order/:id', deleteOrderByIdController)
 
 
 // for hobbies 
@@ -114,6 +114,7 @@ router
 // customers
 router
   .get('/customer', getCustomerController)
+  .delete('/customer/:id', deleteCustomerController)
 
 
 // info routes

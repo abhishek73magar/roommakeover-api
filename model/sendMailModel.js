@@ -1,4 +1,4 @@
-const mailTransporter = require("../libs/mailTransporter")
+const { mailTransporter } = require("../libs/mailTransporter")
 
 exports.sendMailModel = async(body) => {
   try {
