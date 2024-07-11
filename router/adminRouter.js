@@ -14,6 +14,9 @@ const { getCustomerController, deleteCustomerController } = require('../controll
 const { homeInfoController } = require('../controller/admin/infoController');
 const { generateAuthUrlController, oAuthTokenVerifyController, testMailSendController } = require('../controller/admin/googleApiController');
 
+const invoiceController = require('../controller/admin/invoiceController')
+const transactionController = require('../controller/admin/transactionController')
+
 const router = require('express').Router();
 
 // admin list
@@ -44,6 +47,19 @@ router
   .patch("/order", updateOrderForAdminController)
   .delete('/order/:id', deleteOrderByIdController)
 
+// for invoice
+router
+  .post('/invoice', invoiceController.create)
+  .get('/invoice', invoiceController.get)
+  .get('/invoice/:id', invoiceController.getById)
+  .get('/invoice/order/:collection_id', invoiceController.getByCollectionId)
+  .delete('/invoice/:id', invoiceController.remove)
+
+// for transaction
+router
+  .get('/transaction', transactionController.get)
+  .get('/transaction/invoice/:invoice_id', transactionController.getByInvoiceId)
+  .patch('/transaction/:invoice_id', transactionController.update)
 
 // for hobbies 
 router

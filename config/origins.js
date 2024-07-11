@@ -3,6 +3,7 @@ module.exports = [
   "http://localhost:3001",
   "http://localhost:3002",
   "http://localhost:4000",
+  "http://localhost:10001",
   "https://online-shop-three-beryl.vercel.app",
   "https://roommakeover.theminiland.com",
   "https://admin.theminiland.com",
@@ -15,5 +16,6 @@ module.exports = [
   "http://78.46.201.98:9002",
   "http://78.46.201.98:9000",
   "https://beta.roommakeover.com.np",
-  "https://betaadmin.roommakeover.com.np"
+  "https://betaadmin.roommakeover.com.np",
+  "http://localhost:10002"
 ]

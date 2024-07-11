@@ -1,14 +1,14 @@
 const { google } = require('googleapis')
 const fs = require('fs')
-const { MAIL_CLIENT_ID, MAIL_CLIENT_SECRET, MAIL_REDIRECT_URL, MAIL_USER } = require('../../config/config')
+const { MAIL_REDIRECT_URL, MAIL_USER, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET } = require('../../config/config')
 const { mailTransporter } = require('../../libs/mailTransporter')
 
-let oauth2Client = new google.auth.OAuth2(MAIL_CLIENT_ID, MAIL_CLIENT_SECRET, MAIL_REDIRECT_URL);
+let oauth2Client = new google.auth.OAuth2(GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, MAIL_REDIRECT_URL);
 
 
 exports.generateAuthUrlModel = async(body) => {
   try {
-    if(oauth2Client === null) oauth2Client = new google.auth.OAuth2(MAIL_CLIENT_ID, MAIL_CLIENT_SECRET, MAIL_REDIRECT_URL)
+    if(oauth2Client === null) oauth2Client = new google.auth.OAuth2(GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, MAIL_REDIRECT_URL)
     const scopes = ['https://mail.google.com']
     const url = oauth2Client.generateAuthUrl({
       access_type: "offline",

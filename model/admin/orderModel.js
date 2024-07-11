@@ -3,64 +3,88 @@ const _ = require('loadsh')
 
 exports.getOrderForAdminModel = async() => {
     try {
-      // const orders = await knex('orders').orderBy("date", 'DESC')
-
-      // const newOrderList = orders.reduce((prev, curr) => {
-      //   const order = prev.find(item => item.collection_id === curr.collection_id)
-      //   if(order) { order.total_product += 1; order.total_price += curr.qty * curr.price }
-      //   else { prev.push({ ...curr, total_product: 1, total_price: curr.qty * curr.price }) }
-      //   return prev;
-      // }, [])
-
-      // const orderLength = newOrderList.length;
-      // for(let i = 0; i < orderLength; i++){
-      //   const order = newOrderList[i]
-      //   const [billing] = await knex('billing_address').where('id', order.address_id).returning("fullname")
-      //   order.fullname = billing.fullname
-      // }
-
-      // return resolve(newOrderList)
       const query = `
-        SELECT o.*, (
-          SELECT fullname FROM billing_address ba WHERE ba.id=o.address_id LIMIT 1
-        ) as fullname FROM orders o ORDER BY o.date DESC 
+        SELECT *, (
+          SELECT array_agg(
+            json_build_object(
+              'id', id,
+              'collection_id', collection_id,
+              'product_id', product_id,
+              'title', title,
+              'price', price,
+              'qty', qty,
+              'product_option', product_option,
+              'date', date,
+              'review', review,
+              'status', status,
+              'status_datetime', status_datetime,
+              'color', color,
+              'image', (
+                SELECT json_build_object(
+                  'url', url,
+                  'alt', originalname
+                ) FROM product_images pi WHERE pi.product_id=o.product_id LIMIT 1
+              )
+            )
+          ) FROM orders as o WHERE o.collection_id=oc.id
+        ) as orders FROM order_collection oc ORDER BY create_at DESC
       `
 
       const { rows } = await knex.raw(query)
-      const result = _(rows).groupBy('collection_id').map((item, key) =>{
-        const total_product = item.length;
-        const total_price = item.reduce((prev, curr) => prev + (curr.qty * curr.price), 0)
-        const fullname = item[0].fullname
-        // const date = item[0].date
-        return ({ collection_id: key, fullname, total_product, total_price, orders: item })
-      }).value()
+      // console.log(rows)
+      // const result = _(rows).groupBy('collection_id').map((item, key) =>{
+      //   const total_product = item.length;
+      //   const total_price = item.reduce((prev, curr) => prev + (curr.qty * curr.price), 0)
+      //   const fullname = item[0].fullname
+      //   // const date = item[0].date
+      //   return ({ collection_id: key, fullname, total_product, total_price, orders: item })
+      // }).value()
 
-      return result
+      return rows
     } catch (error) {
       console.log(error)
       return Promise.reject(error)
     }
 }
 
-exports.getOrderByIdForAdminModel = (collection_id) => {
-  return new Promise(async(resolve, reject) => {
+exports.getOrderByIdForAdminModel = async(collection_id) => {
     try {
       const query = `
-        SELECT a.*, (
-          SELECT pi.url from product_images pi where pi.product_id=a.product_id LIMIT 1
-        ) as url 
-        FROM orders a
-        WHERE collection_id=?
-        `
+      SELECT *, (
+        SELECT array_agg(
+          json_build_object(
+            'id', id,
+            'collection_id', collection_id,
+            'product_id', product_id,
+            'title', title,
+            'price', price,
+            'qty', qty,
+            'product_option', product_option,
+            'date', date,
+            'review', review,
+            'status', status,
+            'status_datetime', status_datetime,
+            'color', color,
+            'url', (
+              SELECT url FROM product_images pi WHERE pi.product_id=o.product_id LIMIT 1
+            ),
+            'payment_status', (
+              SELECT pt.status FROM order_invoice oi
+              JOIN payment_transaction pt ON pt.invoice_id=oi.id 
+              WHERE pt.collection_id=oc.id AND o.id=ANY(oi.orders)
+              LIMIT 1
+            )
+          )
+        ) FROM orders as o WHERE o.collection_id=oc.id
+      ) as orders FROM order_collection oc WHERE oc.id=? 
+    `
       const { rows } = await knex.raw(query, [collection_id])
       if(rows.length === 0) return reject("Order not found !")
-      const [billing] = await knex('billing_address').where('user_id', rows[0].user_id).andWhere("id", rows[0].address_id)
-      return resolve({ orders: rows, billing })
+      return rows[0]
     } catch (error) {
       console.log(error)
-      return reject(error)
+      return Promise.reject(error)
     }
-  })
 }
 
 exports.updateOrderForAdminModel = (body, query) => {

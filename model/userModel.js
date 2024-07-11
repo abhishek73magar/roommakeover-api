@@ -44,7 +44,7 @@ exports.loginUserModel = (body, res) => {
       const [user] = await knex("users").where("email", email);
       if (!user) return reject("User not found");
       const compare = bcrypt.compareSync(password, user.password);
-      if (!compare) return reject("Invalid user");
+      if (!compare) return reject("Invalid Credentials");
 
       const { id, firstname, lastname } = user;
       const token = genToken({ id, firstname, lastname, email }, expireDate);

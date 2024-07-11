@@ -9,13 +9,13 @@ const {
 
 exports.addBillingAddressController = (req, res) => {
   addBillingAddressModel(req.body, req.user)
-    .then(() => res.status(201).json({ message: `Billing address added` }))
+    .then((response) => res.status(201).json(response))
     .catch((err) => res.status(400).send(err));
 };
 
 exports.updateBillingAddressController = (req, res) => {
   updateBillingAddressModel(req.body, req.params.id, req.user)
-    .then((message) => res.status(200).json({ message }))
+    .then((response) => res.status(200).json(response))
     .catch((err) => res.status(400).send(err));
 };
 

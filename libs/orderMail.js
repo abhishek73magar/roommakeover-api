@@ -1,6 +1,6 @@
 const fs = require('fs')
 const moment = require('moment')
-const { MAIL_USER, BASE_URL } = require('../config/config')
+const { MAIL_USER,  ADMIN_URL } = require('../config/config')
 const { mailTransporter } = require('./mailTransporter')
 const knex = require('../db')
 
@@ -19,7 +19,7 @@ exports.orderMail = async(data) => {
       `)      
     }).join("")
 
-    let orderLink = `${BASE_URL}#/home/orders/${orderId}`
+    let orderLink = `${ADMIN_URL}#/home/orders/${orderId}`
     let totalprice = data.reduce((prev, curr) => prev += curr.qty * curr.price, 0)
     
     const admin = await knex('admin')
@@ -34,15 +34,19 @@ exports.orderMail = async(data) => {
     let subject = `[Order # ${orderId}] recieved`
 
     if(Array.isArray(admin) && admin.length > 0){
-      const mailOptions = admin.map((item) => {  
-        return {
-          from:`Roommakeover.com.np <${MAIL_USER}> `,
-          to: item.email,
-          subject: subject,
-          html: emailTemplate.replace(/{{adminName}}/g, item.fullname)
+      const mailOptions = admin.reduce((prev, item) => {  
+        if(item.order_email){
+          prev.push({
+            from:`Roommakeover.com.np <${MAIL_USER}> `,
+            to: item.email,
+            subject: subject,
+            html: emailTemplate.replace(/{{adminName}}/g, item.fullname)
+          })
         }
-      })
-      
+        
+        return prev;
+      }, [])
+      // console.log(mailOptions.length)
       await mailTransporter(mailOptions, true)
     }
 

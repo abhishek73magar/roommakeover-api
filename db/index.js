@@ -1,13 +1,15 @@
+const { DB_URL } = require("../config/config");
+
 const knex = require("knex")({
   client: "postgresql",
-  connection: process.env.DB_URL,
+  connection: DB_URL,
 });
-
+// console.log(DB_URL)
 // const bcrypt = require("bcrypt");
 knex
   .raw("SELECT 1")
   .then(() => console.log(`Database connected`))
-  .catch((err) => console.log("Database is not connected", err));
+  .catch((err) => console.log("Database is not connected", err.message));
 
 // const userObj = {
 //   email: "admin@rts.com.np",

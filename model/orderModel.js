@@ -2,27 +2,33 @@ const { uid } = require("uid");
 const knex = require("../db");
 const { orderMail } = require("../libs/orderMail");
 
-exports.addOrderModel = (body, user) => {
-  return new Promise(async (resolve, reject) => {
+exports.addOrderModel = async(body, user) => {
     const tnx = await knex.transaction();
     try {
       const collection_id = uid(10);
       const obj = body.map((val) => {
-        return {...val, collection_id, id: uid(10), user_id: user.id };
+        return {...val, id: uid(10), collection_id };
       });
       // console.log(obj);
+      // billing address
+      const [billing] = await knex('billing_address').where({ user_id: user.id })
+      if(!billing) throw "Billing address not found !!"
+      billing.id = collection_id
+      billing.user_id = user.id
+
+
+      await tnx('order_collection').insert(billing)
       await tnx('orders').insert(obj)
       await tnx('checkout').where('user_id', user.id).delete();
 
       await tnx.commit();
-      orderMail(obj)
-      return resolve('Order send')
+      // orderMail(obj).catch(err => console.log(err.message ?? err))
+      return 'Order send'
     } catch (error) {
-      console.log(error);
+      console.log(error.message ?? error);
       await tnx.rollback();
-      return reject(error);
+      return Promise.reject(error);
     }
-  });
 };
 
 exports.updateOrderModel = (body, id) => {
@@ -36,55 +42,83 @@ exports.updateOrderModel = (body, id) => {
   });
 };
 
-exports.getOrdersModel = (user) => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      let orders = await knex("orders").where("user_id", user.id).orderBy("date", "DESC");
+exports.getOrdersModel = async(user) => {
+  try {      
+    const query = `
+      SELECT *, (
+        SELECT array_agg(
+          json_build_object(
+            'id', id,
+            'collection_id', collection_id,
+            'product_id', product_id,
+            'title', title,
+            'price', price,
+            'qty', qty,
+            'product_option', product_option,
+            'date', date,
+            'review', review,
+            'status', status,
+            'status_datetime', status_datetime,
+            'color', color,
+            'image', (
+              SELECT json_build_object(
+                'url', url,
+                'alt', originalname
+              ) FROM product_images pi WHERE pi.product_id=o.product_id LIMIT 1
+            )
+          )
+        ) FROM orders as o WHERE o.collection_id=oc.id
+      ) as orders FROM order_collection oc WHERE user_id=? ORDER BY create_at DESC
+    `
 
-      for (let i = 0; i < orders.length; i++) {
-        const order = orders[i];
-        const [image] = await knex("product_images").where("product_id",order.product_id);
-        order.url = image.url;
-        order.alt = image.originalname;
-      }
-
-      const newOrders = orders.reduce((prev, curr) => {
-        const orderCollection = prev.find((item) => item.collection_id === curr.collection_id);
-        if(orderCollection) { orderCollection.data.push(curr) }
-        else { prev.push({ collection_id: curr.collection_id, datetime: curr.date, data: [ curr ]}) }
-        return prev;
-      }, [])
-      return resolve(newOrders);
-    } catch (error) {
-      console.log(error);
-      return reject(error);
-    }
-  });
+    const { rows: orders } = await knex.raw(query, [user.id])
+    return orders; 
+  } catch (error) {
+    console.log(error.message ?? error);
+    return Promise.reject(error);
+  }
 };
 
-exports.getOrderByIdModel = (collection_id, user) => {
-  return new Promise(async (resolve, reject) => {
+exports.getOrderByIdModel = async(collection_id, user) => {
     try {
-      let orders = await knex("orders").where({ user_id: user.id, collection_id }).orderBy("date", "DESC");
+      const query = `
+        SELECT *, (
+          SELECT array_agg(
+            json_build_object(
+              'id', id,
+              'collection_id', collection_id,
+              'product_id', product_id,
+              'title', title,
+              'price', price,
+              'qty', qty,
+              'product_option', product_option,
+              'date', date,
+              'review', review,
+              'status', status,
+              'status_datetime', status_datetime,
+              'color', color,
+              'image', (
+                SELECT json_build_object(
+                  'url', url,
+                  'alt', originalname
+                ) FROM product_images pi WHERE pi.product_id=o.product_id LIMIT 1
+              ),
+              'payment_status', (
+                SELECT pt.status FROM order_invoice oi
+                JOIN payment_transaction pt ON pt.invoice_id=oi.id 
+                WHERE pt.collection_id=oc.id AND o.id=ANY(oi.orders)
+                LIMIT 1
+              )
+            )
+          ) FROM orders as o WHERE o.collection_id=oc.id
+        ) as orders FROM order_collection oc WHERE user_id=? AND id=?
+      `
+      const { rows: orders } = await knex.raw(query, [user.id, collection_id])
 
-      for (let i = 0; i < orders.length; i++) {
-        const order = orders[i];
-        const [image] = await knex("product_images").where("product_id",order.product_id);
-        order.url = image.url;
-        order.alt = image.originalname;
-      }
-
-      const newOrders = orders.reduce((prev, curr) => {
-        const orderCollection = prev.find((item) => item.collection_id === curr.collection_id);
-        if(orderCollection) { orderCollection.data.push(curr) }
-        else { prev.push({ collection_id: curr.collection_id, datetime: curr.date, data: [ curr ]}) }
-        return prev;
-      }, [])
-      
-      if(newOrders.length === 0) return reject("Order not found !")
-      return resolve(newOrders[0]);
+      if(orders.length === 0) throw "Order not found !"
+      return orders[0];
     } catch (error) {
-      return reject(error);
+      console.log(error.message ?? error)
+      return Promise.reject(error);
     }
-  });
 };

@@ -2,14 +2,15 @@ const nodemailer = require("nodemailer");
 const { google } = require('googleapis')
 const moment = require('moment');
 const { jwtDecode } = require("jwt-decode");
+const { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, MAIL_REDIRECT_URL, MAIL_REFRESH_TOKEN } = require("../config/config");
 
-const CLIENT_ID = process.env.MAIL_CLIENT_ID
-const CLIENT_SECRET = process.env.MAIL_CLIENT_SECRET
-const REDIRECT_URL = 'https://developer.google.com/oauthplayground'
-const REFRESH_TOKEN = process.env.MAIL_REFRESH_TOKEN
+// const CLIENT_ID = process.env.MAIL_CLIENT_ID
+// const CLIENT_SECRET = process.env.MAIL_CLIENT_SECRET
+// const REDIRECT_URL = 'https://developer.google.com/oauthplayground'
+// const REFRESH_TOKEN = process.env.MAIL_REFRESH_TOKEN
 
-const oAuth2Client = new google.auth.OAuth2(CLIENT_ID, CLIENT_SECRET, REDIRECT_URL)
-oAuth2Client.setCredentials({ refresh_token: REFRESH_TOKEN })
+const oAuth2Client = new google.auth.OAuth2(GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, MAIL_REDIRECT_URL)
+oAuth2Client.setCredentials({ refresh_token: MAIL_REFRESH_TOKEN })
 
 let transport = null;
 let retry = 2
@@ -28,7 +29,8 @@ exports.getAccessToken = async(newToken = false) => {
     }
     return token;
   } catch (error) {
-    return Promise.reject(error)
+    // console.log(error.message)
+    return Promise.reject(error.message ?? error)
   }
   
 
@@ -43,8 +45,8 @@ exports.mailTransporter = async(mailOptions, bulk=false, newToken=false) => {
         auth: {
           type: "OAUTH2",
           user: process.env.MAIL_USER,
-          clientId: CLIENT_ID,
-          clientSecret: CLIENT_SECRET,
+          clientId: GOOGLE_CLIENT_ID,
+          clientSecret: GOOGLE_CLIENT_SECRET,
           // refreshToken: REFRESH_TOKEN,
           accessToken: accessToken
         }
@@ -65,7 +67,7 @@ exports.mailTransporter = async(mailOptions, bulk=false, newToken=false) => {
       return this.mailTransporter(mailOptions, bulk, true)
     }
     retry = 2
-    return Promise.reject(error)
+    return Promise.reject(error.message ?? error)
   }
  
 };

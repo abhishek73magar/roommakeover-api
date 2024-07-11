@@ -2,26 +2,14 @@ const knex = require("../db");
 
 exports.addBillingAddressModel = (body, user) => {
   body.user_id = user.id;
-  return knex("billing_address").insert(body);
+  return knex("billing_address").insert(body).returning("*").then(([result]) => result);
 };
 
 exports.updateBillingAddressModel = (body, id, user) => {
-  return new Promise(async (resovle, reject) => {
-    try {
-      // if (body.hasOwnProperty("status") && body.status === "active") {
-      //   await knex("billing_address")
-      //     .where("user_id", user.id)
-      //     .andWhere("status", "active")
-      //     .update({ status: "inactive" });
-      // }
- 
-      await knex("billing_address").where("id", id).andWhere("user_id", user.id).update(body);
-      return resovle("Billing address updated");
-    } catch (error) {
-      console.log(error)
-      return reject(error);
-    }
-  });
+  return knex("billing_address")
+          .where("id", id).andWhere("user_id", user.id)
+          .update(body).returning("*")
+          .then(([result]) => result)
 };
 
 exports.getBillingAddressModel = (user) => {

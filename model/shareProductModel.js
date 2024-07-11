@@ -1,62 +1,60 @@
 const knex = require("../db")
 const { removeFile } = require("../libs/removeFile")
 
-exports.addShareProductModel = (data, files, user) => {
-  return new Promise(async(resolve, reject) => {
+exports.addShareProductModel = async(data, files, user) => {
     const tnx = await knex.transaction();
     try {
-      const obj = {...data, user_id: user.id }
+      const obj = { ...data, user_id: user.id }
       const [product] =  await tnx('share_products').insert(obj).returning("*")
       
+      let imageList = []
       if(files && Array.isArray(files) && files.length !== 0){
         const images = files.map((file) => {
           const url = `share-product/${file.filename}`
           const originalname = file.originalname;
           return { url, originalname, share_product_id: product.id }
         })
-        await tnx('share_product_images').insert(images)
+        imageList = await tnx('share_product_images').insert(images).returning("*")
       }
 
       await tnx.commit();
-      return resolve(obj)
+      return { product, images: imageList }
     } catch (error) {
       console.log(error)
       await tnx.rollback()
       if(files && Array.isArray(files) && files.length !== 0){
         files.forEach(({ filename }) => removeFile(`share-product/${filename}`))
       }
-      return reject(error)
+      return Promise.reject(error)
     }
-  })
 }
 
-exports.updateShareProductModel = (data, files, id, user) => {
-  return new Promise(async(resolve, reject) => {
+exports.updateShareProductModel = async(data, files, id, user) => {
     const tnx = await knex.transaction();
     try {
-      if(data.user_id !== user.id) return reject("This is not your product show you cann't update this product")
-      await tnx('share_products').where('id', id).update(data)
+      if(data.user_id !== user.id) throw "This is not your product show you cann't update this product"
+      let [product] = await tnx('share_products').where('id', id).update(data).returning('*')
      
+      let imageList = []
       if(files && Array.isArray(files) && files.length !== 0){
         const images = files.map((file) => {
           const url = `share-product/${file.filename}`
           const originalname = file.originalname;
           return { url, originalname, share_product_id: id }      
         })  
-        await tnx('share_product_images').insert(images)
+        imageList = await tnx('share_product_images').insert(images).returning('*')
       }
 
       await tnx.commit()
-      return resolve("Your product is updated")
+      return { product, images: imageList }
     } catch (error) {
-      console.log(error)
+      // console.log(error)
       await tnx.rollback();
       if(files && Array.isArray(files) && files.length !== 0){
         files.forEach(({ filename }) => removeFile(`share-product/${filename}`))
       }
-      return reject(error)
+      return Promise.reject(error)
     }
-  })
 }
 
 exports.getShareProductForUserModel = (user) => {

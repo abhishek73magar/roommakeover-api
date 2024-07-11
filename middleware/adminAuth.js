@@ -15,7 +15,7 @@ module.exports = async(req, res, next) =>{
     req.user = decode
     return next()
   } catch (error) {
-    console.log(error)
+    console.log(error.message ?? error)
     return res.status(401).send("Unauthorized User")
   }
 } 

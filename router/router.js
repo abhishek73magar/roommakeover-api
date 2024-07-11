@@ -113,6 +113,9 @@ const {
   removeWishlistController,
 } = require("../controller/wishlistController");
 
+const invoiceController = require('../controller/invoiceController')
+const transactionController = require('../controller/transactionController')
+
 const router = require("express").Router();
 
 router.get("/test", (req, res) => res.send("api is running"));
@@ -140,6 +143,16 @@ router
   .get("/order", getOrdersController)
   .get("/order/history/:total")
   .get("/order/:collection_id", getOrderByIdController);
+
+// invoice
+router
+  .get('/invoice', invoiceController.get)
+  .get('/invoice/order/:collection_id', invoiceController.getByCollectionId)
+  .get('/invoice/:id', invoiceController.getById)
+  // .get('/invoice/:id')
+
+router
+  .get('/transaction/:invoice_id', transactionController.get)
 
 // user auth
 router
