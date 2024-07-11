@@ -305,45 +305,28 @@ exports.getProductByCategoryNameModel = async(name) => {
     }
 }
 
-exports.topSellingProductModel = async(total = 7) => {
+exports.topSellingProductModel = async(total=7) => {
     try {
-      const orderList = await knex("orders")
-        .where("status", "4")
-        .orWhere("status", "1")
-        .orWhere("status", "2");
-
-      const uniqueOrder = orderList.reduce((prev, curr) => {
-        const pid = curr.product_id;
-        if (prev.hasOwnProperty(pid)) { prev[pid] += parseInt(curr.qty) } 
-        else { prev[pid] = parseInt(curr.qty) }
-        return prev;
-      }, {});
-
-      const sortData = Object.keys(uniqueOrder)
-        .map((key) => {
-          return { pid: key, count: uniqueOrder[key] };
-        })
-        .sort((a, b) => b - a)
-        .slice(0, total)
-        .map(({ pid }) => pid);
-
-        const query = `
-        SELECT p.id, p.pid, p.title, p.price, p.on_sale, p.category_id, 
-        (
-          SELECT json_build_object(
-            'url', pi.url,
-            'originalname', pi.originalname
-          ) FROM product_images pi WHERE pi.product_id=p.pid LIMIT 1
-        ) as image       
-        FROM products p WHERE p.pid IN (${sortData.map(_ => '?').join(',')}) AND status='1'
+      const query = `
+        SELECT 
+          COUNT(product_id) as total_product, product_id,
+          p.id, p.pid, p.title, p.price, p.on_sale, p.category_id,
+          (SELECT json_build_object(
+             'url', pi.url,
+             'originalname', pi.originalname
+           ) FROM product_images pi WHERE pi.product_id=p.pid LIMIT 1
+         ) as image
+        FROM orders o 
+        LEFT JOIN products p ON p.pid=o.product_id
+        WHERE o.status=1 OR o.status=2 OR o.status=4 
+        GROUP BY o.product_id, p.id ORDER BY total_product DESC LIMIT ?
       `
 
-      const { rows: products } = await knex.raw(query, sortData)
-
+      const { rows: products } = await knex.raw(query, [total])
       return products
     } catch (error) {
       console.log(error)
-      return Promise.reject(error);
+      return Promise.reject(error.message ?? error);
     }
 };
 
