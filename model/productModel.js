@@ -318,7 +318,7 @@ exports.topSellingProductModel = async(total=7) => {
          ) as image
         FROM orders o 
         LEFT JOIN products p ON p.pid=o.product_id
-        WHERE o.status=1 OR o.status=2 OR o.status=4 
+        WHERE o.status != 0
         GROUP BY o.product_id, p.id ORDER BY total_product DESC LIMIT ?
       `
 
