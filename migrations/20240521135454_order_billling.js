@@ -19,7 +19,7 @@ exports.up = function(knex) {
     // table.foreign('order_collection_id').references('collection_id').inTable('orders').onDelete("CASCADE").onUpdate('CASCADE')
   }).then(() => {
     return knex.schema.alterTable('orders', (table) => {
-      table.dropColumns(['user_id', 'address_id', 'deliver_at', 'category'])
+      table.dropColumns(['user_id', 'address_id', 'delivery_at', 'category'])
       table.foreign('collection_id').references('id').inTable('order_collection').onDelete('CASCADE').onUpdate('CASCADE')
     })
   })
@@ -34,7 +34,7 @@ exports.down = function(knex) {
     table.dropForeign('collection_id')
     table.string('user_id', 255)
     table.string('category', 255)
-    table.integer('deliver_at').defaultTo(1).comment(" 0 = office \n 1 = house")
+    table.integer('delivery_at').defaultTo(1).comment(" 0 = office \n 1 = house")
     table.bigInteger('address_id')
   }).then(() => knex.schema.dropTable('order_collection'))
 };
