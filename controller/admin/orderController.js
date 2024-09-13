@@ -1,4 +1,11 @@
-const { getOrderForAdminModel, updateOrderForAdminModel, getOrderByIdForAdminModel, deleteOrderByIdModel } = require("../../model/admin/orderModel")
+const { getOrderForAdminModel, updateOrderForAdminModel, getOrderByIdForAdminModel, deleteOrderByIdModel, createOrder } = require("../../model/admin/orderModel")
+
+
+exports.createOrder = (req, res) => {
+  return createOrder(req.body, req.user)
+    .then(data => res.status(201).json(data))
+    .catch(err => res.status(400).send(err))
+}
 
 exports.getOrderForAdminController = (req, res) => {
   getOrderForAdminModel()

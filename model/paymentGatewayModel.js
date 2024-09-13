@@ -65,7 +65,7 @@ const khalti = async(body, invoice_id) => {
     // console.log(body)
     const { total } = body;
     const purchase_order_id = `trx_${uid(5)}_${invoice_id}`
-
+    // console.log(total)
     const payload = {
       return_url: `${API_URL}/api/payment/khalti/callback`,
       website_url: BASE_URL,
@@ -85,16 +85,16 @@ const khalti = async(body, invoice_id) => {
 
     return null
   } catch (error) {
-    console.log(error.message ?? error)
+    if(error.response) console.log(error.response.data)
+    else console.log(error.message ?? error)
     return Promise.reject(error)
   }
 }
 
 const khaltiCallback = async(query) => {
   try {
-    console.log(query)
-    if(query.status.toLowerCase !== 'completed') throw new Error(query.status)
     const invoice_id = query.purchase_order_id.split('_').at(-1)
+    if(query.status.toLowerCase() !== 'completed') throw new Error(invoice_id)
 
     const data = {
       transaction_code: query.transaction_code,
@@ -107,7 +107,8 @@ const khaltiCallback = async(query) => {
     await addPaymentTransaction(data, invoice_id)
     return `${BASE_URL}/invoice?id=${invoice_id}`;
   } catch (error) {
-    return { error: error.message ?? error }
+    console.log(error.message ?? err)
+    return Promise.reject(`${BASE_URL}${error.message ? `/invoice?id=${error.message}` : "/myaccount?name=order-invoice"}`)
   }
 }
 

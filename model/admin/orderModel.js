@@ -1,5 +1,46 @@
 const knex = require("../../db")
 const _ = require('loadsh')
+const genPwd = require("generate-password");
+const { uid } = require("uid");
+const bcrypt = require('bcrypt')
+
+exports.createOrder = async(body, admin) => {
+  const tnx = await knex.transaction()
+  try {
+    // console.log(admin)
+    let [user] = await tnx('users').where({ email: body.email })
+    if(!user) {
+      const fullname = body.fullname.split(' ')
+      const salt = bcrypt.genSaltSync(10);
+      const password = genPwd.generate({ strict: true });
+      const hashPassword = bcrypt.hashSync(password, salt);
+      const payload = {
+        id: uid(10),
+        firstname: fullname[0],
+        lastname: fullname.slice(1,).join(' '),
+        email: body.email,
+        password: hashPassword
+      }
+      const [user1] = await tnx('users').insert(payload).returning('*')
+      user = user1
+    }
+    const { products } = body
+    if(!Array.isArray(products) || products.length === 0) throw new Error("Product not found !! Please select one.")
+    const order_collection = { ...body, user_id: user.id, create_by: admin.id }
+    delete order_collection.products;
+    const [collection] = await tnx('order_collection').insert(order_collection).returning('*')
+    const orders = await tnx('orders').insert(products.map((item) => ({...item, collection_id: collection.id }))).returning('*')
+
+    // throw new Error("Not impliment")
+    await tnx.commit()
+    return { ...collection, orders, create_by: admin.fullname };
+  } catch (error) {
+    console.log(error.message ?? error)
+    await tnx.rollback()
+    return Promise.reject(error.message ?? error)
+  }
+}
+
 
 exports.getOrderForAdminModel = async() => {
     try {
@@ -42,7 +83,7 @@ exports.getOrderForAdminModel = async() => {
 
       return rows
     } catch (error) {
-      console.log(error)
+      console.log(error.message ?? error)
       return Promise.reject(error)
     }
 }
@@ -50,7 +91,9 @@ exports.getOrderForAdminModel = async() => {
 exports.getOrderByIdForAdminModel = async(collection_id) => {
     try {
       const query = `
-      SELECT *, (
+      SELECT *, 
+      (SELECT fullname from admin WHERE id = oc.create_by LIMIT 1) as create_by,
+      (
         SELECT array_agg(
           json_build_object(
             'id', id,
@@ -71,18 +114,18 @@ exports.getOrderByIdForAdminModel = async(collection_id) => {
             'payment_status', (
               SELECT pt.status FROM order_invoice oi
               JOIN payment_transaction pt ON pt.invoice_id=oi.id 
-              WHERE pt.collection_id=oc.id AND o.id=ANY(oi.orders)
+              WHERE pt.collection_id=oc.id AND o.id::bigint=ANY(oi.orders)
               LIMIT 1
             )
           )
-        ) FROM orders as o WHERE o.collection_id=oc.id
+        ) FROM orders as o WHERE o.collection_id=oc.id::bigint
       ) as orders FROM order_collection oc WHERE oc.id=? 
     `
       const { rows } = await knex.raw(query, [collection_id])
       if(rows.length === 0) return reject("Order not found !")
       return rows[0]
     } catch (error) {
-      console.log(error)
+      console.log(error.message ?? error)
       return Promise.reject(error)
     }
 }

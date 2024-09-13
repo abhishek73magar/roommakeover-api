@@ -5,29 +5,24 @@ const { orderMail } = require("../libs/orderMail");
 exports.addOrderModel = async(body, user) => {
     const tnx = await knex.transaction();
     try {
-      const collection_id = uid(10);
-      const obj = body.map((val) => {
-        return {...val, id: uid(10), collection_id };
-      });
-      // console.log(obj);
       // billing address
+      if(!Array.isArray(body) || body.length === 0) throw new Error("Order product not found !!")
       const [billing] = await knex('billing_address').where({ user_id: user.id })
       if(!billing) throw "Billing address not found !!"
-      billing.id = collection_id
+      delete billing.id;
       billing.user_id = user.id
 
-
-      await tnx('order_collection').insert(billing)
-      await tnx('orders').insert(obj)
+      const [collection] = await tnx('order_collection').insert(billing).returning('id')
+      const orders = await tnx('orders').insert(body.map((item) => ({...item, collection_id: collection.id }))).returning('*')
       await tnx('checkout').where('user_id', user.id).delete();
 
+      orderMail(orders).catch(err => console.log(err.message ?? err))
       await tnx.commit();
-      // orderMail(obj).catch(err => console.log(err.message ?? err))
       return 'Order send'
     } catch (error) {
       console.log(error.message ?? error);
       await tnx.rollback();
-      return Promise.reject(error);
+      return Promise.reject(error.message ?? error);
     }
 };
 
