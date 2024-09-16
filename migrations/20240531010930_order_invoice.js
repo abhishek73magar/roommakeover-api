@@ -5,8 +5,8 @@
 exports.up = function(knex) {
   return knex.schema.createTable('order_invoice', (table) => {
     table.bigIncrements('id').primary()
-    table.string('collection_id', 255).comment("order collection id")
-    table.specificType('orders', 'varchar[]').defaultTo('{}').comment("all orders ids")
+    table.bigInteger('collection_id', 255).comment("order collection id")
+    table.specificType('orders', 'bigint[]').defaultTo('{}').comment("all orders ids")
     table.integer('shipping_charge').defaultTo(0).comment("Shipping charge if necessary")
     table.integer('discount').defaultTo(0).comment("discount price if necessary")
     // table.bigint('total').comment("Total price of listed orders product")

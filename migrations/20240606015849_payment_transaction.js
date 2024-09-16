@@ -8,7 +8,7 @@ exports.up = function(knex) {
     table.string('transaction_code', 255).notNullable()
     table.string('transaction_uuid', 255).notNullable()
     table.bigint('invoice_id').notNullable()
-    table.string('collection_id')
+    table.bigInteger('collection_id')
     table.double('amount').notNullable()
     table.string('gateway', 1).notNullable().comment(' 1 = esewa \n 2 = khalti \n 3 = fonepay \n 0 = unknown ')
     table.timestamp('create_at', { useTz: true }).defaultTo(knex.fn.now())
